@@ -63,7 +63,7 @@ function load() {
 
 if (offlineDataLog) {
   //@ts-ignore
-  window.dl.load = load();
+  window.dl.load = load;
 } else {
   load();
 }
