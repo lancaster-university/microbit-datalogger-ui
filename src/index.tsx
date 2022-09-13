@@ -21,6 +21,8 @@ const offlineDataLog: OfflineDataLog = window.dl;
 
 ///// Bootstrap
 
+let baseLoad = offlineDataLog && offlineDataLog.load; // todo Object.getOwnPropertyDescriptor(offlineDataLog, "load").get;
+
 function load() {
 
   let log: DataLog = gpsData; // todo
@@ -33,8 +35,6 @@ function load() {
     if (offlineRoot instanceof HTMLElement) {
       offlineRoot.style.display = "none";
     }
-
-    let baseLoad = offlineDataLog.load; // todo Object.getOwnPropertyDescriptor(offlineDataLog, "load").get;
 
     baseLoad();
 
