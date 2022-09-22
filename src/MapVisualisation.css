@@ -13,3 +13,33 @@
     text-align: center;
     padding: 0.8em;
 }
+
+.timeline-container {
+    background-color: #222;
+    padding: 0.5em;
+    color: #fefefe;
+}
+
+.timeline {
+    display: flex;
+    width: 100%;
+}
+
+.timeline-title {
+    font-weight: 600;
+    font-size: large;
+    padding-bottom: 0.2em;
+}
+
+.map-timeline-time {
+    width: 4em;
+}
+
+.timeline-slider {
+    flex: 1;
+}
+
+.map-vis-container {
+    display: flex;
+    flex-direction: column;
+}

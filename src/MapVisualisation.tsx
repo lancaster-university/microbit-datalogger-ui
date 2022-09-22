@@ -1,4 +1,4 @@
-import { timestampRegex, visualisationConfig, VisualisationType } from "./App";
+import { timestampRegex, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
 import { ReactNode, useEffect, useState } from "react";
 import React from "react";
 import "./MapVisualisation.css";
@@ -11,19 +11,15 @@ import { RiMap2Line, RiMapLine } from "react-icons/ri";
 const latitudeColumn = "Latitude";
 const longitudeColumn = "Longitude";
 
-interface MapViewProps {
-    log: DataLog
-}
-
-function MapView(props: MapViewProps) {
+function Map({log}: VisualisationProps) {
 
     const [selectedRow, setSelectedRow] = useState(-1);
     const [mapConsent, setMapConsent] = useState(() => window.localStorage.getItem("open-street-map-consent") === "true");
     const [currentTime, setCurrentTime] = useState(0);
 
-    const [latsCol] = useState(() => props.log.dataForHeader(latitudeColumn).map(elem => Number(elem)));
-    const [lonsCol] = useState(() => props.log.dataForHeader(longitudeColumn).map(elem => Number(elem)));
-    const [timeCol] = useState(() => (props.log.dataForHeader(timestampRegex) || [0]).map(elem => Number(elem)));
+    const [latsCol] = useState(() => log.dataForHeader(latitudeColumn, true).map(elem => Number(elem)));
+    const [lonsCol] = useState(() => log.dataForHeader(longitudeColumn, true).map(elem => Number(elem)));
+    const [timeCol] = useState(() => (log.dataForHeader(timestampRegex, true) || [0]).map(elem => Number(elem)));
 
     const firstOverTime = timeCol.findIndex(elem => Number(elem) >= currentTime);
     const maxTime = timeCol[timeCol.length - 1];
@@ -50,7 +46,7 @@ function MapView(props: MapViewProps) {
             center: { lat: latsCol.length === 0 ? 0 : latsCol[0], lon: lonsCol.length === 0 ? 0 : lonsCol[0] },
             zoom: 16
         },
-        height: 500,
+        height: 600,
         margin: { r: 0, t: 0, b: 0, l: 0 },
         uirevision: "true"
     }));
@@ -90,8 +86,8 @@ function MapView(props: MapViewProps) {
         type: "scattermapbox",
         lat: [...lats, nextLat],
         lon: [...lons, nextLon],
-        text: lats.map((_, index) => props.log.headers.filter(header => header !== latitudeColumn && header !== longitudeColumn).map(heading => heading + ": " + props.log.dataForHeader(heading)[index]).join(", ")),
-        marker: { color: "fuchsia", size: 9 },
+        text: lats.map((_, index) => log.headers.filter(header => header !== latitudeColumn && header !== longitudeColumn).map(heading => heading + ": " + log.dataForHeader(heading)[index]).join(", ")),
+        marker: { color: "rgb(205, 3, 101)", size: 9 },
         mode: "lines+markers",
         line: {
             width: 3,
@@ -100,11 +96,16 @@ function MapView(props: MapViewProps) {
     };
 
     return (
-        <>
+        <div className="map-vis-container">
             <Plot className="graph" data={[data]} layout={layout} config={visualisationConfig} />
-            <div>{currentTime}</div>
-            <input style={{width: "100%"}} type="range" min={0} max={maxTime * 1000} value={currentTime * 1000} onChange={(e) => setCurrentTime(Number(e.target.value) / 1000)} />
-        </>
+            <div className="timeline-container">
+                <div className="timeline-title">Timeline</div>
+                <div className="timeline">
+                    <div className="map-timeline-time">{currentTime}</div>
+                    <input className="timeline-slider" type="range" min={0} max={maxTime * 1000} value={currentTime * 1000} onChange={(e) => setCurrentTime(Number(e.target.value) / 1000)} />
+                </div>
+            </div>
+        </div>
     );
 }
 
@@ -112,8 +113,8 @@ const MapVisualisation: VisualisationType = {
     name: "Map",
     icon: <RiMap2Line />,
     availablityError: log => {
-        const lats = log.dataForHeader(latitudeColumn);
-        const lngs = log.dataForHeader(longitudeColumn);
+        const lats = log.dataForHeader(latitudeColumn, true);
+        const lngs = log.dataForHeader(longitudeColumn, true);
 
         if (lats.length === 0 || lngs.length === 0) {
             return "Latitude and Longitude columns are required.";
@@ -130,9 +131,7 @@ const MapVisualisation: VisualisationType = {
 
         return null;
     },
-    generate: log => {
-        return (<MapView log={log} />);
-    }
+    generate: (props) => <Map {...props}/>
 };
 
 export default MapVisualisation;

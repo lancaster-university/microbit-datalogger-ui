@@ -5,10 +5,16 @@ export interface DataLogRow {
 
 export default class DataLog {
 
+    private static emptyLog: DataLog = new DataLog([], []);
+
     constructor(public headers: string[], public data: DataLogRow[]) {
     }
 
     public static fromCSV(csv: string): DataLog {
+        if (csv.length == 0) {
+            return this.emptyLog;
+        }
+
         const rows = csv.replace("\r", "").split("\n");
         const headers = rows[0].split(",");
         const data: DataLogRow[] = [];
@@ -22,14 +28,18 @@ export default class DataLog {
         return new DataLog(headers, data);
     }
 
-    public dataForHeader(header: string | number | RegExp): string[] {
+    public dataForHeader(header: string | number | RegExp, excludeHeaders = false): (string | null)[] {
         const index = typeof header === "number" ? header : header instanceof RegExp ? this.headers.findIndex(h => header.test(h)) : this.headers.indexOf(header);
 
         if (index === -1) {
             return [];
         }
 
-        return this.data.filter(data => !data.isHeading).map(data => data.data[index]);
+        return this.data.filter(row => !row.isHeading || !excludeHeaders).map(row => row.isHeading ? null : row.data[index]);
+    }
+
+    get isEmpty() {
+        return this.headers.length == 0 || this.data.length == 0;
     }
 
     public toCSV(): string {

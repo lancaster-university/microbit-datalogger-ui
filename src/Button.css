@@ -35,10 +35,6 @@ button.primary {
     color: #fff;
 }
 
-button:focus {
-    outline: 3px solid rgba(66, 153, 225, 0.6);
-}
-
 .button-main.dropdown {
     border-radius: 23px 0 0 23px;
 }

@@ -6,13 +6,14 @@ export interface ModalProps extends ModalContents {
 }
 
 export interface ModalContents {
-    content: JSX.Element,
-    title: string
+    content: JSX.Element;
+    title: string;
 }
 
 export default function Modal(props: ModalProps) {
 
     const modalRef = useRef<HTMLDialogElement>(null);
+    const closeButtonRef = useRef<HTMLButtonElement>(null);
     const [closing, setClosing] = useState(false);
 
     const close = () => {
@@ -26,8 +27,16 @@ export default function Modal(props: ModalProps) {
     useEffect(() => {
         const dialog = modalRef.current;
         dialog?.showModal();
+
+        const closeButton = closeButtonRef.current;
+        closeButton?.focus();
+
         return () => dialog?.close();
     });
+
+    if (!props.content) {
+        return null;
+    }
 
     return (
         <dialog ref={modalRef} className={"modal " + (closing ? "modal-closing" : "")}>
@@ -38,7 +47,7 @@ export default function Modal(props: ModalProps) {
                 {props.content}
             </div>
             <div className="modal-buttons">
-                <button onClick={close}>Close</button>
+                <button ref={closeButtonRef} onClick={close}>Close</button>
             </div>
         </dialog>
     )

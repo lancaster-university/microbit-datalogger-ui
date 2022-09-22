@@ -2,21 +2,35 @@ table {
     border-collapse: collapse;
     margin-top: 1em;
     text-align: right;
+    border: 1px solid #ddd;
 }
 
-tr:first-child {
+.header-row {
     font-weight: bold;
     text-align: center;
+    background: #f0f0f0;
+
+    -position: sticky;
+    -top: 0;
 }
 
 td {
-    border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     padding: 0.6em;
     min-width: 10ch;
 }
 
+tr :first-child {
+    min-width: 3ch;
+    width: 3ch;
+    border-right: 1px solid #ddd;
+    background: #f0f0f0;
+    text-align: center;
+}
+
 tr {
     transition: all 0.2s;
+    outline: 2px solid transparent;
 }
 
 tr:nth-child(even) {
@@ -25,6 +39,7 @@ tr:nth-child(even) {
 
 tr:hover {
     background-color: #ddd;
+    outline: 3px solid rgba(66, 153, 225, 0.6);
 }
 
 #datalog-end {
@@ -34,6 +49,6 @@ tr:hover {
     border-top: 2px solid #333333;
 }
 
-.discontinous {
+.discontinuous {
     border-top: 2px dashed #777;
 }

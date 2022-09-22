@@ -19,7 +19,11 @@ export interface VisualisationType {
   name: string;
   icon: JSX.Element;
   availablityError: (log: DataLog) => string | null;
-  generate: (log: DataLog) => JSX.Element;
+  generate: (props: VisualisationProps) => JSX.Element;
+}
+
+export interface VisualisationProps {
+  log: DataLog;
 }
 
 export const timestampRegex = /Time \(.+\)/;
@@ -134,7 +138,7 @@ export function App(props: AppProps) {
             This is the data on your micro:bit. To analyse it and create your own graphs, transfer it to your computer. You can copy and paste your data, or download it as a CSV file which you can import into a spreadsheet or graphing tool. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank">Learn more about micro:bit data logging</a>.
           </p>
           <div id="data">
-            {visualisation && visualisation.generate(log)}
+            {visualisation && visualisation.generate({log})}
             <DataLogTable log={log} highlightDiscontinuousTimes={visualisation === LineGraphVisualisation} />
           </div>
         </main>
