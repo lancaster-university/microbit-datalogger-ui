@@ -62,6 +62,10 @@ export default class DataLog {
         for (let i = 0; i < this.data.length; i++) {
             const row = this.data[i];
 
+            if (row.isHeading) {
+                continue; // todo just ignore headers - do we want this?
+            }
+
             if (where(row, prevRow, i)) { // if we should split here...
                 
                 splitLogs.push(new DataLog(this.headers, currentData, false));

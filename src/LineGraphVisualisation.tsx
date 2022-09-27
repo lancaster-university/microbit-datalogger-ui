@@ -2,54 +2,10 @@ import Plot from "react-plotly.js";
 import { Data } from 'plotly.js';
 import { timestampRegex, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
 import "./LineGraphVisualisation.css";
-import DataLog from "./DataLog";
 import { RiLineChartLine } from "react-icons/ri";
-import VisualisationConfigEditor from "./VisualisationConfigEditor";
 
 function LineGraph({log}: VisualisationProps) {
-    const now = Date.now();
-
     const splitLogs = log.split((row, prevRow) => !row.isHeading && !!prevRow && Number(row.data[0]) < Number(prevRow.data[0]));
-
-
-    /*const headings = Object.keys(log);
-
-    // todo: error when going back in time!
-
-    //if (abortRow) {
-    //  rows[abortRow].id = "abort-row";
-    //}
-
-    const graphX = log[headings[0]];
-    const graphY = log;
-
-    const splitLogs: DataLog[] = [];
-
-    let prevTimestamp = 0;
-
-    let currentLog: DataLog = {};
-
-    headings.forEach(heading => currentLog[heading] = []);
-
-    for (let y = 0; y < graphX.length; y++) {
-        if (Number(graphX[y]) < prevTimestamp) {
-            // we've gone back in time! split the log here to create multiple graphs...
-
-            splitLogs.push(currentLog);
-
-            currentLog = {};
-
-            headings.forEach(heading => currentLog[heading] = []);
-        }
-
-        headings.forEach(heading => {
-            currentLog[heading].push(log[heading][y]);
-        });
-
-        prevTimestamp = Number(graphX[y]);
-    }
-
-    splitLogs.push(currentLog);*/
 
     const colors = [
         // micro:bit brand colors
@@ -61,13 +17,12 @@ function LineGraph({log}: VisualisationProps) {
         "rgb(123, 205, 194)",
     ];
 
-    let currentRow = 1;
-
-    const graphX = log.dataForHeader(0, true);
+    let currentRow = 0;
 
     const res= (<div>
-        <VisualisationConfigEditor/>
         {splitLogs.map(log => {
+            const graphX = log.dataForHeader(0, true);
+
             const data: Data[] = log.headers.slice(1).map((header, index): Data => {
                 return {
                     name: header,
@@ -86,8 +41,10 @@ function LineGraph({log}: VisualisationProps) {
             }
             );
 
-            let rowFrom = currentRow;
-            let rowTo = (currentRow += log.data.length) - 1;
+            debugger;
+
+            let rowFrom = currentRow + 1;
+            let rowTo = (currentRow += log.data.length);
 
             return [
             <div className="graph-span">Rows {rowFrom} - {rowTo}</div>,
@@ -103,7 +60,6 @@ function LineGraph({log}: VisualisationProps) {
         })}
     </div>);
 
-    console.log("VIS RENDER: " + (Date.now() - now) + " " + (Date.now()));
     return res;
 };
 

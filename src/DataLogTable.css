@@ -24,6 +24,7 @@ tr :first-child {
     width: 4ch;
     background: #f0f0f0;
     text-align: center;
+    cursor: pointer;
     user-select: none; /* avoid selecting the row number when manually selecting and copying data from the table */
 }
 
