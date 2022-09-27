@@ -5,7 +5,6 @@ import "./MapVisualisation.css";
 import Plot from "react-plotly.js";
 import { Data, Layout, PlotData } from "plotly.js";
 import DataLog from "./DataLog";
-import { lstat } from "fs";
 import { RiMap2Line, RiMapLine } from "react-icons/ri";
 
 const latitudeColumn = "Latitude";

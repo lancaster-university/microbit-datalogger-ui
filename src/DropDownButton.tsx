@@ -4,9 +4,9 @@ import "./Button.css";
 import DropDownMenu from "./DropDownMenu";
 
 export interface ButtonProps {
-    dropdown?: JSX.Element[],
-    children: React.ReactNode,
-    onClick?: () => any,
+    dropdown?: JSX.Element[];
+    children: React.ReactNode;
+    onClick?: () => any;
     onDropdownSelected?: (index: number) => any;
     primary?: boolean;
 }

@@ -14,6 +14,7 @@ import DataLog from './DataLog';
 import { gpsData } from './sample-data';
 import { RiClipboardLine, RiDeleteBin2Line, RiDownload2Line, RiRefreshLine, RiShareLine } from "react-icons/ri";
 import { IconContext } from 'react-icons';
+import Warning from './Warning';
 
 export interface VisualisationType {
   name: string;
@@ -92,7 +93,7 @@ export function App(props: AppProps) {
   }
 
   const clearLog = () => {
-    showModal({ title: "Clearing Log", content: <div>The log is cleared when you reflash your micro:bit. Your program can include code or blocks to clear the log when you choose. <a href="https://microbit.org/get-started/user-guide/data-logging/">Learn more about data logging</a>.</div> });
+    showModal({ title: "Clearing Log", content: <div>The log is cleared when you reflash your micro:bit. Your program can include code or blocks to clear the log when you choose. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank">Learn more about data logging</a>.</div> });
   }
 
   const visualise = (visIndex: number) => {
@@ -131,14 +132,24 @@ export function App(props: AppProps) {
             <button onClick={copy}><RiClipboardLine />Copy</button>
             <button onClick={updateData}><RiRefreshLine />Update data…</button>
             <button onClick={clearLog}><RiDeleteBin2Line />Clear log…</button>
-            <button onClick={debugCSV}>Debug CSV</button>
+            {window.localStorage.getItem("dl-debug") && <button onClick={debugCSV}>Debug CSV</button>}
             {visualPreviews.length > 0 && <DropDownButton dropdown={visualPreviews.map(vis => <>{vis.icon}{vis.name}</>)} onClick={() => visualise(-1)} onDropdownSelected={index => visualise(index)}>{visualisation ? "Close " + visualisation.name : <>{visualPreviews[0].icon}{visualPreviews[0].name}</>}</DropDownButton>}
           </div>
           <p id="info">
             This is the data on your micro:bit. To analyse it and create your own graphs, transfer it to your computer. You can copy and paste your data, or download it as a CSV file which you can import into a spreadsheet or graphing tool. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank">Learn more about micro:bit data logging</a>.
           </p>
+          {log.isFull &&
+            <Warning title="Log is full">
+              You won't be able to log any more data until the log is cleared. <a href="https://support.microbit.org/support/solutions/articles/19000127516-what-to-do-when-the-data-log-is-full" target="_blank">Learn more</a>.
+            </Warning>
+          }
+          {log.isEmpty &&
+            <Warning title="Log is empty">
+              You haven't logged any data yet. Click the link above to learn more about how to log data on the micro:bit.
+            </Warning>
+          }
           <div id="data">
-            {visualisation && visualisation.generate({log})}
+            {visualisation && visualisation.generate({ log })}
             <DataLogTable log={log} highlightDiscontinuousTimes={visualisation === LineGraphVisualisation} />
           </div>
         </main>

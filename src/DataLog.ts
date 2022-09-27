@@ -5,13 +5,13 @@ export interface DataLogRow {
 
 export default class DataLog {
 
-    private static emptyLog: DataLog = new DataLog([], []);
+    private static emptyLog: DataLog = new DataLog([], [], false);
 
-    constructor(public headers: string[], public data: DataLogRow[]) {
+    constructor(public headers: string[], public data: DataLogRow[], public isFull: boolean = false) {
     }
 
-    public static fromCSV(csv: string): DataLog {
-        if (csv.length == 0) {
+    public static fromCSV(csv: string, isFull: boolean = false): DataLog {
+        if (csv.length === 0) {
             return this.emptyLog;
         }
 
@@ -25,7 +25,7 @@ export default class DataLog {
             data.push({data: cols, isHeading: index === 0});
         });
 
-        return new DataLog(headers, data);
+        return new DataLog(headers, data, isFull);
     }
 
     public dataForHeader(header: string | number | RegExp, excludeHeaders = false): (string | null)[] {
@@ -39,14 +39,14 @@ export default class DataLog {
     }
 
     get isEmpty() {
-        return this.headers.length == 0 || this.data.length == 0;
+        return this.headers.length === 0 || this.data.length === 0;
     }
 
     public toCSV(): string {
         return this.data.map(row =>
             row.data
-                .map(value => value.replaceAll('"', '""'))
-                .map(value => `"${value}"`)
+                //.map(value => value.replaceAll('"', '""'))
+                //.map(value => `"${value}"`)
                 .join(",")
         ).join("\n");
     }
@@ -64,7 +64,7 @@ export default class DataLog {
 
             if (where(row, prevRow, i)) { // if we should split here...
                 
-                splitLogs.push(new DataLog(this.headers, currentData));
+                splitLogs.push(new DataLog(this.headers, currentData, false));
                 currentData = [];
             }
 
@@ -73,7 +73,7 @@ export default class DataLog {
             prevRow = row;
         }
 
-        splitLogs.push(new DataLog(this.headers, currentData));
+        splitLogs.push(new DataLog(this.headers, currentData, false));
 
         return splitLogs;
     }

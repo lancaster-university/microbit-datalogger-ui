@@ -22,7 +22,7 @@ main {
   margin-left: 10px
 }
 
-#info {
+#info, .warning {
   max-width: 68em;
   line-height: 1.3;
 }

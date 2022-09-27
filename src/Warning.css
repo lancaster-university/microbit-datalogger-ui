@@ -1,0 +1,16 @@
+.warning {
+    background: rgb(235, 235, 235);
+    padding: 0.6em;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.warning .icon {
+    font-size: 1.8em;
+    margin-right: 0.3em;
+}
+
+.warning h3 {
+    margin: 0 0 0.1em 0;
+}

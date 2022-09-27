@@ -8,8 +8,6 @@ type DataLogProps = {
     highlightDiscontinuousTimes?: boolean
 }
 
-let redrawCount = 0;
-
 function DataLogTable(props: DataLogProps) {
     // get the column with the highest row count
     //const headers = Object.keys(props.log);
@@ -17,6 +15,19 @@ function DataLogTable(props: DataLogProps) {
 
     const headers = props.log.headers;
     const logLength = props.log.data.length;
+
+    // when we click on the row number, highlight the cell contents as if a user manually dragged over and selected it
+    const highlightRow = (e: React.MouseEvent<HTMLTableCellElement>) => {
+        const target = e.target as HTMLTableCellElement;
+
+        const range = document.createRange();
+        range.selectNodeContents(target.parentElement as Node);
+
+        const selection = window.getSelection();
+        
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+    };
 
     const now = Date.now();
 
@@ -31,7 +42,7 @@ function DataLogTable(props: DataLogProps) {
 
         const rowData = props.log.data[i];
 
-        row.push(<td key={-1}>{rowData.isHeading ? "" : i}</td>);
+        row.push(<td key={-1} onClick={highlightRow}>{rowData.isHeading ? "" : i}</td>);
 
         let discontinuous = false;
 
@@ -55,12 +66,8 @@ function DataLogTable(props: DataLogProps) {
 
     return (
         <table>
-            <div>Redraw count {++redrawCount}</div>
             <tbody>
                 {rows}
-                <tr>
-                    <td colSpan={headers.length + 1} id="datalog-end">End of data log</td>
-                </tr>
             </tbody>
         </table>
     );
