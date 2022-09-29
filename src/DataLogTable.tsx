@@ -3,33 +3,32 @@ import { timestampRegex } from "./App";
 import DataLog from "./DataLog";
 import "./DataLogTable.css";
 
-type DataLogProps = {
-    log: DataLog,
-    highlightDiscontinuousTimes?: boolean
+export interface DataLogProps {
+    log: DataLog;
+    /**
+     * Whether or not discontinuous times should be highlighted. This is when time runs backwards
+     * when a timestamp header is present, likely to indicate the micro:bit has been reset in between
+     * capturing sets of data
+     */
+    highlightDiscontinuousTimes?: boolean;
 }
 
-function DataLogTable(props: DataLogProps) {
-    // get the column with the highest row count
-    //const headers = Object.keys(props.log);
-    //const logLength = headers.map(header => props.log[header].length).reduce((p, c) => p > c ? p : c); // p = our highest row count
+// when we click on the row number, highlight the cell contents as if a user manually dragged over and selected it
+const highlightRow = (e: React.MouseEvent<HTMLTableCellElement>) => {
+    const target = e.target as HTMLTableCellElement;
 
+    const range = document.createRange();
+    range.selectNodeContents(target.parentElement as Node);
+
+    const selection = window.getSelection();
+
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+};
+
+function DataLogTable(props: DataLogProps) {
     const headers = props.log.headers;
     const logLength = props.log.data.length;
-
-    // when we click on the row number, highlight the cell contents as if a user manually dragged over and selected it
-    const highlightRow = (e: React.MouseEvent<HTMLTableCellElement>) => {
-        const target = e.target as HTMLTableCellElement;
-
-        const range = document.createRange();
-        range.selectNodeContents(target.parentElement as Node);
-
-        const selection = window.getSelection();
-        
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-    };
-
-    const now = Date.now();
 
     const rows = [];
 
@@ -42,6 +41,8 @@ function DataLogTable(props: DataLogProps) {
 
         const rowData = props.log.data[i];
 
+        // push a column containing the row number. clicking on it will highlight
+        // the entire row, akin to spreadsheet software
         row.push(<td key={-1} onClick={highlightRow}>{rowData.isHeading ? "" : i}</td>);
 
         let discontinuous = false;
@@ -49,7 +50,8 @@ function DataLogTable(props: DataLogProps) {
         if (highlightDiscontinuous) {
             const firstRowValue = Number(rowData.data[0]);
 
-            discontinuous = highlightDiscontinuous && firstRowValue < prevRowTimestamp;
+            // has time gone backwards??
+            discontinuous = firstRowValue < prevRowTimestamp;
             prevRowTimestamp = firstRowValue;
         }
 
@@ -62,8 +64,6 @@ function DataLogTable(props: DataLogProps) {
         rows.push(<tr key={i} className={`${discontinuous ? 'discontinuous' : ''} ${rowData.isHeading ? 'header-row' : ''}`}>{row}</tr>);
     }
 
-    console.log("RENDER " + (Date.now() - now));
-
     return (
         <table>
             <tbody>
@@ -73,4 +73,6 @@ function DataLogTable(props: DataLogProps) {
     );
 }
 
+// memo it as we don't want to constantly re-render, performance can be hit
+// for large data sets
 export default React.memo(DataLogTable);

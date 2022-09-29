@@ -4,22 +4,45 @@ import "./Button.css";
 import DropDownMenu from "./DropDownMenu";
 
 export interface ButtonProps {
+    /**
+     * The contents of each secondary element of the button
+     */
     dropdown?: JSX.Element[];
+    /**
+     * The contents of the main section of the button
+     */
     children: React.ReactNode;
+    /**
+     * Event handler for clicking on the main action for this button
+     */
     onClick?: () => any;
+    /**
+     * Event handler for clicking on any of the secondary actions for this
+     * button. Contains the index of the selected item
+     */
     onDropdownSelected?: (index: number) => any;
+    /**
+     * Whether this is a primary button. Will apply the 'primary' css style
+     * to both button sections if so
+     */
     primary?: boolean;
 }
 
-function DropDownButton(props: ButtonProps) {
+/**
+ * A combination of a button and drop-down menu. A drop-down button has
+ * a primary action, and a list of secondary actions which can be accessed
+ * by clicking on the ... icon
+ */
+export default function DropDownButton(props: ButtonProps) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedIndex, setSelectedIndex] = useState(0);
 
+    // close the menu if it loses focus
+    // todo: this doesn't work in all cases
     const handleBlur = (event: any) => {
         if (event.relatedTarget !== null && !event.currentTarget.contains(event.relatedTarget)) {
             setDropdownOpen(false);
         }
-    }
+    };
 
     const handleDropdownSelect = (index: number) => {
         setDropdownOpen(false);
@@ -29,8 +52,9 @@ function DropDownButton(props: ButtonProps) {
     const handleMainButtonClick = () => {
         setDropdownOpen(false);
         props.onClick && props.onClick();
-    }
+    };
 
+    // if we don't have any dropdown entries, just render as a normal button
     const validDropdown = props.dropdown && props.dropdown.length > 0;
 
     return (
@@ -47,5 +71,3 @@ function DropDownButton(props: ButtonProps) {
         </div>
     );
 }
-
-export default DropDownButton;

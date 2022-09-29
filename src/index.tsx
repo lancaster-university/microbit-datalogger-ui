@@ -13,63 +13,127 @@ interface OfflineDataLog {
   clear(): void;
   load(): any;
 
-  csv: string; // todo
+  raw: string; // the raw log data
+  upd: number; // interval ID for iframe update checker approach
 }
 
-//@ts-ignore
-const offlineDataLog: OfflineDataLog = window.dl;
+export interface LogData {
+  log: DataLog;
+  hash: number;
+  dataSize: number;
+  bytesRemaining: number;
+  daplinkVersion: number;
+}
 
-///// Bootstrap
-
-let baseLoad = offlineDataLog && offlineDataLog.load; // todo Object.getOwnPropertyDescriptor(offlineDataLog, "load").get;
-
-function load() {
-
-  let log: DataLog = gpsData; // todo
-
-  // Check if we're loading in-place. This is done when being inserted on top of
-  // the offline datalogger
-  if (offlineDataLog) {
-    let offlineRoot = document.querySelector("#w");
-
-    if (offlineRoot instanceof HTMLElement) {
-      offlineRoot.style.display = "none";
-    }
-
-    baseLoad();
-
-    const reactRoot = document.createElement("div");
-    reactRoot.id = "root";
-
-    document.body.appendChild(reactRoot);
-
-    //@ts-ignore
-    log = DataLog.fromCSV(window.csv);
+export function parseRawData(raw: string): LogData | null {
+  if (!/^UBIT_LOG_FS_V_002/.test(raw)) {
+    return null;
   }
 
-  //window.csv = window.x; //x = csv data
-  //window.dataLog = readData(window.csv); 
+  const daplinkVersion = parseInt(raw.substring(40, 44));
+  const dataStart = parseInt(raw.substring(29, 39)) - 2048; // hex encoded
+  const logEnd = parseInt(raw.substring(18, 28)) - 2048; // hex encoded
 
-  // Load react in place!
+  let dataSize = 0;
+  while (raw.charCodeAt(dataStart + dataSize) !== 0xfffd) {
+    dataSize++;
+  }
 
-  const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+  const bytesRemaining = logEnd - dataStart - dataSize;
 
-  root.render(
-    //<React.StrictMode>
-      <App log={log} />
-    //</React.StrictMode>
-  );
+  let hash = 0;
+  for (let i = 0; i < raw.length; i++) {
+    hash = 31 * hash + raw.charCodeAt(i);
+    hash |= 0;
+  }
+
+  const full = raw.substring(logEnd + 1, logEnd + 4) === "FUL";
+  const log = DataLog.fromCSV(raw.substring(dataStart, dataStart + dataSize), full);
+
+  return { log, hash, dataSize, bytesRemaining, daplinkVersion };
 }
 
-if (offlineDataLog) {
+(function () {
+
+  // Check if we're just an iframe, used to check for updates to the file on the disk.
+  // Update checker iframes have the hash of the main page appended to it
+  if (window.location.href.split("?")[1] !== undefined) {
+    return; // we don't want to bother loading up react or anything!
+  }
+
   //@ts-ignore
-  window.dl.load = load;
-} else {
-  load();
-}
+  const offlineDataLog: OfflineDataLog = window.dl;
 
-/* Object.defineProperty(dl, "load", {
-  get: load
-}); */ // todo
+  ///// Bootstrap
 
-/// End bootstrap
+  let baseLoad = offlineDataLog && offlineDataLog.load; // todo Object.getOwnPropertyDescriptor(offlineDataLog, "load").get;
+
+  function load() {
+
+    // dummy default data for testing
+    let data: LogData = {
+      log: gpsData,
+      hash: 0,
+      dataSize: 100,
+      bytesRemaining: 100,
+      daplinkVersion: 0
+    };
+
+    // Check if we're loading in-place. This is done when being inserted on top of
+    // the offline datalogger
+    if (offlineDataLog) {
+      let offlineRoot = document.querySelector("#w");
+
+      if (offlineRoot instanceof HTMLElement) {
+        offlineRoot.style.display = "none";
+      }
+
+      baseLoad();
+
+      const logData = parseRawData(offlineDataLog.raw);
+
+      if (!logData) {
+        // TODO: error handle
+        return;
+      }
+
+      data = logData;
+
+      // override this so we give a user a prompt if they want to reload rather than
+      // immediately reloading
+      onmessage = e => {
+        window.dispatchEvent(new CustomEvent("dl-update", e.data));
+      };
+
+      const reactRoot = document.createElement("div");
+      reactRoot.id = "root";
+
+      document.body.appendChild(reactRoot);
+
+      offlineRoot?.remove();
+    }
+
+    // Load react in place!
+
+    const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+
+    root.render(
+      //<React.StrictMode>
+      <App {...data} />
+      //</React.StrictMode>
+    );
+  }
+
+  if (offlineDataLog) {
+    //@ts-ignore
+    window.dl.load = load;
+  } else {
+    load();
+  }
+
+  /* Object.defineProperty(dl, "load", {
+    get: load
+  }); */ // todo
+
+  /// End bootstrap
+})();
