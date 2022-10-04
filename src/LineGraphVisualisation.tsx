@@ -1,10 +1,13 @@
-import Plot from "react-plotly.js";
 import { Data } from 'plotly.js';
 import { timestampRegex, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
 import "./LineGraphVisualisation.css";
 import { RiLineChartLine } from "react-icons/ri";
+import Warning from "./Warning";
+import React, { Suspense } from 'react';
 
-function LineGraph({log}: VisualisationProps) {
+const Plot = React.lazy(() => import("react-plotly.js"));
+
+function LineGraph({ log }: VisualisationProps) {
     const splitLogs = log.split((row, prevRow) => !row.isHeading && !!prevRow && Number(row.data[0]) < Number(prevRow.data[0]));
 
     const colors = [
@@ -19,7 +22,14 @@ function LineGraph({log}: VisualisationProps) {
 
     let currentRow = 0;
 
-    const res= (<div>
+    return (<div className="line-graph-vis-container">
+        {splitLogs.length > 0 &&
+
+            <Warning title="Split graphs">
+                <div>Your data has been split into multiple graphs as multiple time ranges have been found in the logged data. This may happen if you unplug or reset your micro:bit in between logging data.</div>
+            </Warning>
+
+        }
         {splitLogs.map(log => {
             const graphX = log.dataForHeader(0, true);
 
@@ -41,31 +51,30 @@ function LineGraph({log}: VisualisationProps) {
             }
             );
 
-            debugger;
-
             let rowFrom = currentRow + 1;
             let rowTo = (currentRow += log.data.length);
 
-            return [
-            <div className="graph-span">Rows {rowFrom} - {rowTo}</div>,
-            <Plot
-                data={data}
+            return (
+                <div key={rowFrom}>
+                    <div className="graph-span">Rows {rowFrom} - {rowTo}</div>
+                    <Suspense fallback={<div className="loading">Loading...</div>}>
+                        <Plot
+                            data={data}
 
-                className="graph"
+                            className="graph"
 
-                layout={{ height: 500, margin: {l: 60, r: 60, t: 30, b: 70}, xaxis: { title: log.headers[0] } }}
-                config={visualisationConfig}
-            />
-        ];
+                            layout={{ height: 500, margin: { l: 60, r: 60, t: 30, b: 70 }, xaxis: { title: log.headers[0] } }}
+                            config={visualisationConfig}
+                        />
+                    </Suspense>
+                </div>);
         })}
     </div>);
-
-    return res;
 };
 
 const LineGraphVisualisation: VisualisationType = {
     name: "Line Graph",
-    icon: <RiLineChartLine/>,
+    icon: <RiLineChartLine />,
     availablityError: log => {
         if (log.headers.length < 2) {
             return "Requires two or more columns. Timestamps must be enabled.";
@@ -77,7 +86,7 @@ const LineGraphVisualisation: VisualisationType = {
 
         return null;
     },
-    generate: (props) => <LineGraph {...props}/>
+    generate: (props) => <LineGraph {...props} />
 };
 
 export default LineGraphVisualisation;

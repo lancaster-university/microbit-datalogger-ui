@@ -1,67 +1,50 @@
-import { timestampRegex, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
-import { ReactNode, useEffect, useState } from "react";
+import { visualisationConfig, VisualisationProps, VisualisationType } from "./App";
+import { Suspense, useState } from "react";
 import React from "react";
 import "./MapVisualisation.css";
-import Plot from "react-plotly.js";
-import { Data, Layout, PlotData } from "plotly.js";
-import DataLog from "./DataLog";
-import { RiMap2Line, RiMapLine } from "react-icons/ri";
+import { Data, Layout } from "plotly.js";
+import { RiMap2Line } from "react-icons/ri";
+import Warning from "./Warning";
+
+const Plot = React.lazy(() => import("react-plotly.js"));
 
 const latitudeColumn = "Latitude";
 const longitudeColumn = "Longitude";
 
-function Map({log}: VisualisationProps) {
+function Map({ log }: VisualisationProps) {
 
-    const [selectedRow, setSelectedRow] = useState(-1);
     const [mapConsent, setMapConsent] = useState(() => window.localStorage.getItem("open-street-map-consent") === "true");
-    const [currentTime, setCurrentTime] = useState(0);
+    const [invalidCoords, setInvalidCoords] = useState(false);
 
-    const [latsCol] = useState(() => log.dataForHeader(latitudeColumn, true).map(elem => Number(elem)));
-    const [lonsCol] = useState(() => log.dataForHeader(longitudeColumn, true).map(elem => Number(elem)));
-    const [timeCol] = useState(() => (log.dataForHeader(timestampRegex, true) || [0]).map(elem => Number(elem)));
+    const [lats] = useState(() => log.dataForHeader(latitudeColumn, true).map(elem => Number(elem)).map(elem => {
+        if (elem < -90 || elem > 90) {
+            setInvalidCoords(true);
+            return Math.min(90, Math.max(-90, elem));
+        }
 
-    const firstOverTime = timeCol.findIndex(elem => Number(elem) >= currentTime);
-    const maxTime = timeCol[timeCol.length - 1];
+        return elem;
+    }));
 
-    const lats = latsCol.slice(0, firstOverTime);
-    const lons = lonsCol.slice(0, firstOverTime);
+    const [lons] = useState(() => log.dataForHeader(longitudeColumn, true).map(elem => Number(elem)).map(elem => {
+        if (elem < -180 || elem > 180) {
+            setInvalidCoords(true);
+            return Math.min(180, Math.max(-180, elem));
+        }
 
-    const tween = (start: number, end: number, value: number) => start + (value * (end - start));
-
-    let nextLat = latsCol[firstOverTime];
-    let nextLon = lonsCol[firstOverTime];
-
-    const prevTime = firstOverTime === 0 ? 0 : timeCol[firstOverTime - 1];
-    const nextTime = timeCol[firstOverTime];
-    const timeProgress = (currentTime - prevTime) / (nextTime - prevTime);
-
-    nextLat = tween(lats[lats.length - 1], nextLat, timeProgress);
-    nextLon = tween(lons[lons.length - 1], nextLon, timeProgress);
+        return elem;
+    }));
 
     const [layout] = useState<Partial<Layout>>(() => ({
         dragmode: "zoom",
         mapbox: {
             style: "open-street-map",
-            center: { lat: latsCol.length === 0 ? 0 : latsCol[0], lon: lonsCol.length === 0 ? 0 : lonsCol[0] },
+            center: { lat: lats.length === 0 ? 0 : lats[0], lon: lons.length === 0 ? 0 : lons[0] },
             zoom: 16
         },
         height: 600,
         margin: { r: 0, t: 0, b: 0, l: 0 },
         uirevision: "true"
     }));
-
-    const handleMarkerHover = (index: number) => {
-        setSelectedRow(index);
-    }
-
-    const handleMarkerLeave = () => {
-        setSelectedRow(-1);
-    }
-
-    /*useEffect(() => {
-        const timer = setInterval(() => setCurrentTime(prev => prev + 0.05), 50);
-        return () => clearInterval(timer);
-    });*/
 
     if (!mapConsent) {
         return (
@@ -83,9 +66,9 @@ function Map({log}: VisualisationProps) {
 
     const data: Data = {
         type: "scattermapbox",
-        lat: [...lats, nextLat],
-        lon: [...lons, nextLon],
-        text: lats.map((_, index) => log.headers.filter(header => header !== latitudeColumn && header !== longitudeColumn).map(heading => heading + ": " + log.dataForHeader(heading)[index]).join(", ")),
+        lat: lats,
+        lon: lons,
+        text: lats.map((_, index) => log.headers.filter(header => header !== latitudeColumn && header !== longitudeColumn).map(heading => heading + ": " + log.dataForHeader(heading, true)[index]).join(", ")),
         marker: { color: "rgb(205, 3, 101)", size: 9 },
         mode: "lines+markers",
         line: {
@@ -95,16 +78,17 @@ function Map({log}: VisualisationProps) {
     };
 
     return (
-        <div className="map-vis-container">
-            <Plot className="graph" data={[data]} layout={layout} config={visualisationConfig} />
-            <div className="timeline-container">
-                <div className="timeline-title">Timeline</div>
-                <div className="timeline">
-                    <div className="map-timeline-time">{currentTime}</div>
-                    <input className="timeline-slider" type="range" min={0} max={maxTime * 1000} value={currentTime * 1000} onChange={(e) => setCurrentTime(Number(e.target.value) / 1000)} />
-                </div>
+        <Suspense fallback={<div className="loading">Loading...</div>}>
+            <div className="map-vis-container">
+                {invalidCoords &&
+                    <Warning title="Invalid co-ordinate data">
+                        <div>Some of the fields within the graph have been rounded as they contained invalid latitude or longitude values</div>
+                    </Warning>
+                }
+
+                <Plot className="graph map" data={[data]} layout={layout} config={visualisationConfig} />
             </div>
-        </div>
+        </Suspense>
     );
 }
 
@@ -130,7 +114,7 @@ const MapVisualisation: VisualisationType = {
 
         return null;
     },
-    generate: (props) => <Map {...props}/>
+    generate: (props) => <Map {...props} />
 };
 
 export default MapVisualisation;

@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { RiRefreshLine } from "react-icons/ri";
 import "./DataUpdateNotification.css";
 
 export default function DataUpdateNotification({ visible }: { visible: boolean }) {
 
-    const [ignored, setIgnored] = useState<boolean>(false);
+    const [ignored] = useState<boolean>(false);
     const [closing, setClosing] = useState<boolean>(false);
 
     const close = () => {

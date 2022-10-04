@@ -85,7 +85,7 @@ export function parseRawData(raw: string): LogData | null {
       let offlineRoot = document.querySelector("#w");
 
       if (offlineRoot instanceof HTMLElement) {
-        offlineRoot.style.display = "none";
+        offlineRoot.style.visibility = "collapse";
       }
 
       baseLoad();
@@ -94,6 +94,10 @@ export function parseRawData(raw: string): LogData | null {
 
       if (!logData) {
         // TODO: error handle
+        if (offlineRoot instanceof HTMLElement) {
+          console.log("Failed to parse log data and load online log, falling back to offline view...");
+          offlineRoot.style.visibility = "visible";
+        }
         return;
       }
 
@@ -102,7 +106,7 @@ export function parseRawData(raw: string): LogData | null {
       // override this so we give a user a prompt if they want to reload rather than
       // immediately reloading
       onmessage = e => {
-        window.dispatchEvent(new CustomEvent("dl-update", e.data));
+        window.dispatchEvent(new CustomEvent("dl-update", {detail: e.data}));
       };
 
       const reactRoot = document.createElement("div");
@@ -110,7 +114,10 @@ export function parseRawData(raw: string): LogData | null {
 
       document.body.appendChild(reactRoot);
 
-      offlineRoot?.remove();
+      // keep it around to allow the iframe update checker to still work
+      if (offlineRoot instanceof HTMLElement) {
+        offlineRoot.innerHTML = "";
+      }
     }
 
     // Load react in place!

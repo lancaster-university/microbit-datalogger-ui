@@ -8,7 +8,6 @@ import MapVisualisation from './MapVisualisation';
 import DropDownButton from './DropDownButton';
 import Modal, { ModalContents, ModalProps } from './Modal';
 import DataLog from './DataLog';
-import { gpsData } from './sample-data';
 import { RiClipboardLine, RiDeleteBin2Line, RiDownload2Line, RiRefreshLine, RiShareLine } from "react-icons/ri";
 import { IconContext } from 'react-icons';
 import Warning from './Warning';
@@ -93,7 +92,12 @@ export default function App(props: LogData) {
       if (e instanceof CustomEvent) {
         const data = parseRawData(e.detail);
 
-        setUpdateAvailable(data);
+        // if we choose to update our data to the latest from disk, since the offline js
+        // isn't aware of this it'll continuously inform us of updates to the original
+        // data. so we just manually filter that out here.
+        if (!!data && data.hash !== logData.hash) {
+          setUpdateAvailable(data);
+        }
       }
     }
 
@@ -128,7 +132,7 @@ export default function App(props: LogData) {
   }
 
   const clearLog = () => {
-    showModal({ title: "Clearing Log", content: <div>The log is cleared when you reflash your micro:bit. Your program can include code or blocks to clear the log when you choose. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank">Learn more about data logging</a>.</div> });
+    showModal({ title: "Clearing Log", content: <div>The log is cleared when you reflash your micro:bit. Your program can include code or blocks to clear the log when you choose. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank" rel="noreferrer">Learn more about data logging</a>.</div> });
   }
 
   const visualise = (visIndex: number) => {
@@ -163,7 +167,7 @@ export default function App(props: LogData) {
       <div className="app">
         {modal && <Modal {...modal} />}
         <Header />
-        <DataUpdateNotification visible={!updateAvailable} />
+        <DataUpdateNotification visible={!!updateAvailable} />
         <main>
           <h1>micro:bit data log</h1>
           <div className="buttons">
@@ -175,11 +179,11 @@ export default function App(props: LogData) {
             {visualPreviews.length > 0 && <DropDownButton dropdown={visualPreviews.map(vis => <>{vis.icon}{vis.name}</>)} onClick={() => visualise(-1)} onDropdownSelected={index => visualise(index)}>{visualisation ? "Close " + visualisation.name : <>{visualPreviews[0].icon}{visualPreviews[0].name}</>}</DropDownButton>}
           </div>
           <p id="info">
-            This is the data on your micro:bit. To analyse it and create your own graphs, transfer it to your computer. You can copy and paste your data, or download it as a CSV file which you can import into a spreadsheet or graphing tool. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank">Learn more about micro:bit data logging</a>.
+            This is the data on your micro:bit. To analyse it and create your own graphs, transfer it to your computer. You can copy and paste your data, or download it as a CSV file which you can import into a spreadsheet or graphing tool. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank" rel="noreferrer">Learn more about micro:bit data logging</a>.
           </p>
           {log.isFull &&
             <Warning title="Log is full">
-              You won't be able to log any more data until the log is cleared. <a href="https://support.microbit.org/support/solutions/articles/19000127516-what-to-do-when-the-data-log-is-full" target="_blank">Learn more</a>.
+              You won't be able to log any more data until the log is cleared. <a href="https://support.microbit.org/support/solutions/articles/19000127516-what-to-do-when-the-data-log-is-full" target="_blank" rel="noreferrer">Learn more</a>.
             </Warning>
           }
           {log.isEmpty &&
