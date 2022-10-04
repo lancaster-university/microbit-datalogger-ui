@@ -55,5 +55,5 @@
     "@types/plotly.js": "^2.12.2",
     "@types/react-plotly.js": "^2.5.1"
   },
-  "homepage": "https://github.com/lancaster-university/microbit-datalogger-ui/"
+  "homepage": "https://lancaster-university.github.io/microbit-datalogger-ui/"
 }
