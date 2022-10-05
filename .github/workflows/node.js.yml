@@ -34,9 +34,7 @@ jobs:
         git config user.email "github-actions[bot]@users.noreply.github.com"
     
     - name: Build Deployment Files
-      run: |
-        npm run build
-        react-scripts build && node postbuild.js
+      run: npm run build
     
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
