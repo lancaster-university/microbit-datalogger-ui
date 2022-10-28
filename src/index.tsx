@@ -1,8 +1,6 @@
 import "core-js/es/array";
 import "react-app-polyfill/ie11";
-import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
 import DataLog from "./DataLog";
 import { gpsData } from "./sample-data";
 import LogDataProvider from "./LogDataProvider";

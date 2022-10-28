@@ -1,5 +1,3 @@
-import { FieldType } from "./FieldTypes";
-
 /**
  * Contains data for one row of the data log. Each row may also be a header row, this will happen
  * if new headers are introduced after data has already been written to the log. The micro:bit data log
