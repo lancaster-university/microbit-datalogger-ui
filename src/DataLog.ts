@@ -1,3 +1,5 @@
+import { FieldType } from "./FieldTypes";
+
 /**
  * Contains data for one row of the data log. Each row may also be a header row, this will happen
  * if new headers are introduced after data has already been written to the log. The micro:bit data log
@@ -40,7 +42,7 @@ export default class DataLog {
             return this.emptyLog;
         }
 
-        const rows = csv.replace("\r", "").split("\n");
+        const rows = csv.replace("\r", "").split("\n").filter(row => row !== "");
         const headers = rows[0].split(",");
         const data: DataLogRow[] = [];
 

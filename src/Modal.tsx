@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import "./Modal.css";
 
 export interface ModalProps extends ModalContents {
-    onClose: () => any;
+    onClose?: () => any;
 }
 
 export interface ModalContents {
     content: JSX.Element;
     title: string;
+    hideCloseButton?: boolean;
 }
 
 export default function Modal(props: ModalProps) {
@@ -20,7 +21,7 @@ export default function Modal(props: ModalProps) {
         setClosing(true);
 
         setTimeout(() => {
-            props.onClose();
+            props.onClose && props.onClose();
         }, 150);
     }
 
@@ -47,7 +48,7 @@ export default function Modal(props: ModalProps) {
                 {props.content}
             </div>
             <div className="modal-buttons">
-                <button ref={closeButtonRef} onClick={close}>Close</button>
+                {!props.hideCloseButton && <button ref={closeButtonRef} onClick={close}>Close</button>}
             </div>
         </dialog>
     )

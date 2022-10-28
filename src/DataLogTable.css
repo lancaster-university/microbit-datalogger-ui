@@ -1,8 +1,15 @@
 table {
-    border-collapse: collapse;
-    margin-top: 1em;
     text-align: right;
+    border-collapse: collapse;
+}
+
+.datalog-table {
+    margin-top: 1em;
     border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #ddd;
+    overflow: hidden;
+    display: inline-block;
 }
 
 .header-row {
@@ -19,6 +26,11 @@ td {
     min-width: 10ch;
 }
 
+tr {
+    background: white;
+    transition: all 0.2s;
+}
+
 tr :first-child {
     min-width: 4ch;
     width: 4ch;
@@ -26,10 +38,6 @@ tr :first-child {
     text-align: center;
     cursor: pointer;
     user-select: none; /* avoid selecting the row number when manually selecting and copying data from the table */
-}
-
-tr {
-    transition: all 0.2s;
 }
 
 tr:nth-child(even) {
@@ -42,4 +50,8 @@ tr:hover {
 
 .discontinuous {
     border-top: 2px dashed #777;
+}
+
+tr:first-of-type {
+    border-radius: 8px;
 }

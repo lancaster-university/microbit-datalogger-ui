@@ -65,11 +65,13 @@ function DataLogTable(props: DataLogProps) {
     }
 
     return (
-        <table>
-            <tbody>
-                {rows}
-            </tbody>
-        </table>
+        <div className="datalog-table">
+            <table>
+                <tbody>
+                    {rows}
+                </tbody>
+            </table>
+        </div>
     );
 }
 

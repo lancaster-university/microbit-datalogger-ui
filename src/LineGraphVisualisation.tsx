@@ -36,7 +36,7 @@ function LineGraph({ log }: VisualisationProps) {
             const data: Data[] = log.headers.slice(1).map((header, index): Data => {
                 return {
                     name: header,
-                    type: "scattergl",
+                    type: "scatter",
                     mode: "lines+markers",
                     x: graphX,
                     y: log.dataForHeader(header, true),

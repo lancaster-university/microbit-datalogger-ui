@@ -154,13 +154,13 @@ export default function App(props: LogData) {
     const data = prompt("csv data?");
 
     if (data) {
-     // setLog(DataLog.fromCSV(data));
+      // setLog(DataLog.fromCSV(data));
     }
   }
 
   const handleShare = (index: number = 0) => {
     shareTargets[index].onShare(log);
-  }
+  };
 
   return (
     <IconContext.Provider value={{ className: "icon" }}>

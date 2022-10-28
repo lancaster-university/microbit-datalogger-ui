@@ -5,6 +5,9 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import DataLog from "./DataLog";
 import { gpsData } from "./sample-data";
+import LogDataProvider from "./LogDataProvider";
+
+import "./index.css";
 
 interface OfflineDataLog {
   download(): void;
@@ -71,13 +74,14 @@ export function parseRawData(raw: string): LogData | null {
   function load() {
 
     // dummy default data for testing
-    let data: LogData = {
+    let data: LogData | null = {
       log: gpsData,
       hash: 0,
       dataSize: 100,
       bytesRemaining: 100,
       daplinkVersion: 0
     };
+    data = null;
 
     // Check if we're loading in-place. This is done when being inserted on top of
     // the offline datalogger
@@ -126,7 +130,7 @@ export function parseRawData(raw: string): LogData | null {
 
     root.render(
       //<React.StrictMode>
-      <App {...data} />
+      <LogDataProvider log={data} />
       //</React.StrictMode>
     );
   }

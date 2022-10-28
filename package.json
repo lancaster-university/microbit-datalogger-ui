@@ -24,9 +24,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build && node postbuild.js",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
@@ -53,7 +53,8 @@
   },
   "devDependencies": {
     "@types/plotly.js": "^2.12.2",
-    "@types/react-plotly.js": "^2.5.1"
+    "@types/react-plotly.js": "^2.5.1",
+    "react-app-rewired": "^2.2.1"
   },
   "homepage": "https://lancaster-university.github.io/microbit-datalogger-ui"
 }
