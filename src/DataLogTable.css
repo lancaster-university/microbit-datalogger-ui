@@ -1,15 +1,10 @@
 table {
     text-align: right;
     border-collapse: collapse;
-}
-
-.datalog-table {
-    margin-top: 1em;
-    border: 1px solid #ddd;
-    border-radius: 8px;
     background: #ddd;
     overflow: hidden;
-    display: inline-block;
+    border: thin solid #ddd;
+    border-radius: 8px;
 }
 
 .header-row {
@@ -21,14 +16,21 @@ table {
 }
 
 td {
-    border: 1px solid #ddd;
     padding: 0.6em;
-    min-width: 10ch;
+    min-width: 12ch;
 }
 
 tr {
-    background: white;
+    background: #fdfdfd;
     transition: all 0.2s;
+}
+
+tr:not(:last-child) {
+    border-bottom: thin solid #ddd;
+}
+
+td:not(:last-child) {
+    border-right: thin solid #ddd;
 }
 
 tr :first-child {
@@ -38,10 +40,11 @@ tr :first-child {
     text-align: center;
     cursor: pointer;
     user-select: none; /* avoid selecting the row number when manually selecting and copying data from the table */
+    border-right: thin solid #ddd;
 }
 
-tr:nth-child(even) {
-    background: #f8f8f8;
+tr:nth-child(odd) {
+    background: #f1f1f1;
 }
 
 tr:hover {

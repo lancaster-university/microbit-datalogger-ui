@@ -18,8 +18,9 @@
     margin-top: 3px;
 
     background: white;
-    border: 1px solid #777;
-    border-radius: 13px;
+    border: thin solid #aaa;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     overflow: hidden;
 
     padding: 0.3em 0;
@@ -32,7 +33,8 @@
     transition: background linear 0.2s;
 }
 
-.dropdown-menu > div:hover {
+.dropdown-menu > div:hover, .dropdown-menu > div:focus {
     background: #ddd;
     cursor: pointer;
+    outline: none;
 }
