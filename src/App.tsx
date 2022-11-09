@@ -185,7 +185,7 @@ export default function App(props: LogData) {
           <section id="data">
             <DataLogTable log={log} highlightDiscontinuousTimes={visualisation === LineGraphVisualisation} />
             <aside>
-              {log.isFull || true &&
+              {log.isFull &&
                 <Warning title="Log is full">
                   You won't be able to log any more data until the log is cleared. <a href="https://support.microbit.org/support/solutions/articles/19000127516-what-to-do-when-the-data-log-is-full" target="_blank" rel="noreferrer">Learn more</a>.
                 </Warning>
