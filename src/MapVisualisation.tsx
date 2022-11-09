@@ -2,7 +2,7 @@ import { visualisationConfig, VisualisationProps, VisualisationType } from "./Ap
 import { Suspense, useState } from "react";
 import React from "react";
 import "./MapVisualisation.css";
-import { Data, Layout } from "plotly.js";
+import { Data, Layout, PlotMarker } from "plotly.js";
 import { RiMap2Line } from "react-icons/ri";
 import Warning from "./Warning";
 
@@ -15,6 +15,8 @@ function Map({ log }: VisualisationProps) {
 
     const [mapConsent, setMapConsent] = useState(() => window.localStorage.getItem("open-street-map-consent") === "true");
     const [invalidCoords, setInvalidCoords] = useState(false);
+
+    const [visualiseColumn, setVisualiseColumn] = useState<string | null>(() => log.headers[0]);
 
     const [lats] = useState(() => log.dataForHeader(latitudeColumn, true).map(elem => Number(elem)).map(elem => {
         if (elem < -90 || elem > 90) {
@@ -42,8 +44,7 @@ function Map({ log }: VisualisationProps) {
             zoom: 16
         },
         height: 600,
-        margin: { r: 0, t: 0, b: 0, l: 0 },
-        uirevision: "true"
+        margin: { r: 0, t: 0, b: 0, l: 0 }
     }));
 
     if (!mapConsent) {
@@ -64,17 +65,48 @@ function Map({ log }: VisualisationProps) {
         );
     }
 
+    let marker: Partial<PlotMarker>;
+
+    if (visualiseColumn === null) {
+        marker = { color: "rgb(205, 3, 101)", size: 9 };
+    } else {
+        const scl: Array<[number, string]> = [[0, 'rgb(150,0,90)'], [0.125, 'rgb(0, 0, 200)'], [0.25, 'rgb(0, 25, 255)'], [0.375, 'rgb(0, 152, 255)'], [0.5, 'rgb(44, 255, 150)'], [0.625, 'rgb(151, 255, 0)'], [0.75, 'rgb(255, 234, 0)'], [0.875, 'rgb(255, 111, 0)'], [1, 'rgb(255, 0, 0)']];
+
+        const row = log.dataForHeader(visualiseColumn, true).map(row => row === null ? 0 : Number(row));
+
+        const max = row.reduce((max, curr) => curr > max ? curr : max);
+        const min = row.reduce((min, curr) => curr < min ? curr : min, max);
+
+        marker = {
+            color: row,
+            colorscale: scl,
+            cmin: min,
+            cmax: max,
+            reversescale: true,
+            size: 9,
+            colorbar: {
+                thickness: 10,
+                titleside: 'right',
+                outlinecolor: 'transparent',
+                title: visualiseColumn,
+                xpad: 0,
+                ypad: 10
+            }
+        };
+    }
+
     const data: Data = {
         type: "scattermapbox",
         lat: lats,
         lon: lons,
         text: lats.map((_, index) => log.headers.filter(header => header !== latitudeColumn && header !== longitudeColumn).map(heading => heading + ": " + log.dataForHeader(heading, true)[index]).join(", ")),
-        marker: { color: "rgb(205, 3, 101)", size: 9 },
-        mode: "lines+markers",
+        marker,
+        mode: "markers"
+        /*mode: "lines+markers",
         line: {
             width: 3,
-            color: [...Array(Math.max(lats.length - 1, 0)).fill("red"), "green"]
-        }
+            color: "red"
+        }*/
     };
 
     return (
@@ -87,6 +119,15 @@ function Map({ log }: VisualisationProps) {
                 }
 
                 <Plot className="graph map" data={[data]} layout={layout} config={visualisationConfig} />
+
+                <div className="graph-config">
+                    <label htmlFor="map-column-selector">Column to highlight</label>
+                    <select id="map-column-selector" placeholder="Set column to visualise" onChange={e => setVisualiseColumn(e.target.value)}>
+                        {log.headers.map(h =>
+                            <option key={h} value={h}>{h}</option>
+                        )}
+                    </select>
+                </div>
             </div>
         </Suspense>
     );

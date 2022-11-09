@@ -42,9 +42,16 @@
 .map-vis-container {
     display: flex;
     flex-direction: column;
-    gap: 0.8em;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.map {
-    border-radius: 8px;
+.graph-config {
+    background: rgb(235, 235, 235);
+    border-top: thin solid #ddd;
+    padding: 1em;
+}
+
+#map-column-selector {
+    margin-left: 0.6em;
 }
