@@ -7,8 +7,16 @@ import React, { Suspense } from 'react';
 
 const Plot = React.lazy(() => import("react-plotly.js"));
 
+const MAX_GRAPHS = 5; // performance!
+
 function LineGraph({ log }: VisualisationProps) {
-    const splitLogs = log.split((row, prevRow) => !row.isHeading && !!prevRow && Number(row.data[0]) < Number(prevRow.data[0]));
+    let splitLogs = log.split((row, prevRow) => !row.isHeading && !!prevRow && Number(row.data[0]) < Number(prevRow.data[0]));
+
+    const truncated = splitLogs.length > MAX_GRAPHS;
+
+    if (truncated) {
+        splitLogs = splitLogs.slice(0, MAX_GRAPHS);
+    }
 
     const colors = [
         // micro:bit brand colors

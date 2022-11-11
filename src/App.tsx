@@ -8,11 +8,12 @@ import MapVisualisation from './MapVisualisation';
 import DropDownButton from './DropDownButton';
 import Modal, { ModalContents, ModalProps } from './Modal';
 import DataLog from './DataLog';
-import { RiClipboardLine, RiDeleteBin2Line, RiDownload2Line, RiRefreshLine, RiShareLine } from "react-icons/ri";
+import { RiCheckLine, RiClipboardLine, RiCloseLine, RiDeleteBin2Line, RiDownload2Line, RiRefreshLine, RiShareLine } from "react-icons/ri";
 import { IconContext } from 'react-icons';
 import Warning from './Warning';
 import { LogData, parseRawData } from '.';
 import DataUpdateNotification from './DataUpdateNotification';
+import IconButton from './IconButton';
 
 /**
  * Visualisations are the context-specific ways of presenting data in the data log.
@@ -119,6 +120,8 @@ export default function App(props: LogData) {
 
   const copy = () => {
     navigator.clipboard.writeText(log.toCSV());
+
+    return <RiCheckLine/>;
   }
 
   const updateData = () => {
@@ -128,11 +131,11 @@ export default function App(props: LogData) {
       return;
     }
 
-    showModal({ title: "Updating Data", content: <div>To see the latest data that changed after you opened this file, you must unplug your micro:bit and plug it back in.</div> });
+    showModal({ title: "No changes detected", content: <div>To see the latest data that changed after you opened this file, you must unplug your micro:bit and plug it back in.</div> });
   }
 
   const clearLog = () => {
-    showModal({ title: "Clearing Log", content: <div>The log is cleared when you reflash your micro:bit. Your program can include code or blocks to clear the log when you choose. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank" rel="noreferrer">Learn more about data logging</a>.</div> });
+    showModal({ title: "Clearing the data log", content: <div>The log is cleared when you reflash your micro:bit. Your program can include code or blocks to clear the log when you choose. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank" rel="noreferrer">Learn more about data logging</a>.</div> });
   }
 
   const visualise = (visIndex: number) => {
@@ -149,15 +152,6 @@ export default function App(props: LogData) {
     setVisualisation(visualPreviews[visIndex]);
   }
 
-  // create a 'dl-debug' local storage property to access this
-  const debugCSV = () => {
-    const data = prompt("csv data?");
-
-    if (data) {
-      // setLog(DataLog.fromCSV(data));
-    }
-  }
-
   const handleShare = (index: number = 0) => {
     shareTargets[index].onShare(log);
   };
@@ -172,11 +166,10 @@ export default function App(props: LogData) {
           <h1>micro:bit data log</h1>
           <section className="buttons">
             <DropDownButton primary={true} dropdown={shareTargets.map(target => <>{target.icon}{target.name}</>)} onClick={handleShare} onDropdownSelected={handleShare}><>{shareTargets[0].icon}{shareTargets[0].name}</></DropDownButton>
-            <button onClick={copy}><RiClipboardLine />Copy</button>
-            <button onClick={updateData}><RiRefreshLine />Update data</button>
-            <button onClick={clearLog}><RiDeleteBin2Line />Clear log</button>
-            {window.localStorage.getItem("dl-debug") && <button onClick={debugCSV}>Debug CSV</button>}
-            {visualPreviews.length > 0 && <DropDownButton dropdown={visualPreviews.map(vis => <>{vis.icon}{vis.name}</>)} onClick={() => visualise(-1)} onDropdownSelected={index => visualise(index)}>{visualisation ? "Close " + visualisation.name : <>{visualPreviews[0].icon}{visualPreviews[0].name}</>}</DropDownButton>}
+            <IconButton onClick={copy} icon={<RiClipboardLine />} caption="Copy" />
+            {!props.standalone && <IconButton onClick={updateData} icon={<RiRefreshLine />} caption="Update data" />}
+            {!props.standalone && <IconButton onClick={clearLog} icon={<RiDeleteBin2Line />} caption="Clear log" />}
+            {visualPreviews.length > 0 && <DropDownButton dropdown={visualPreviews.map(vis => <>{vis.icon}{vis.name}</>)} onClick={() => visualise(-1)} onDropdownSelected={index => visualise(index)}>{visualisation ? <><RiCloseLine/> Close {visualisation.name}</> : <>{visualPreviews[0].icon}{visualPreviews[0].name}</>}</DropDownButton>}
           </section>
           <p id="info">
             This is the data on your micro:bit. To analyse it and create your own graphs, transfer it to your computer. You can copy and paste your data, or download it as a CSV file which you can import into a spreadsheet or graphing tool. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank" rel="noreferrer">Learn more about micro:bit data logging</a>.

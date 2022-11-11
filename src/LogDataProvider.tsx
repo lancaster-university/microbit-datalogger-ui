@@ -19,7 +19,8 @@ export default function LogDataProvider({log}: {log: LogData | null}) {
                 daplinkVersion: -1,
                 dataSize: 0,
                 hash: 0,
-                log: DataLog.fromCSV(data, false)
+                log: DataLog.fromCSV(data, false),
+                standalone: true
             });
         }
     };

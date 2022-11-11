@@ -5,6 +5,7 @@ table {
     overflow: hidden;
     border: thin solid #ddd;
     border-radius: 8px;
+    margin-top: 0;
 }
 
 .header-row {

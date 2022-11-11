@@ -64,6 +64,10 @@ function DataLogTable(props: DataLogProps) {
         rows.push(<tr key={i} className={`${discontinuous ? 'discontinuous' : ''} ${rowData.isHeading ? 'header-row' : ''}`}>{row}</tr>);
     }
 
+    if (rows.length === 0) {
+        return null;
+    }
+
     return (
         <table>
             <tbody>

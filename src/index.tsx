@@ -6,6 +6,7 @@ import { gpsData } from "./sample-data";
 import LogDataProvider from "./LogDataProvider";
 
 import "./index.css";
+import ErrorHandler from "./ErrorHandler";
 
 interface OfflineDataLog {
   download(): void;
@@ -24,6 +25,7 @@ export interface LogData {
   dataSize: number;
   bytesRemaining: number;
   daplinkVersion: number;
+  standalone: boolean;
 }
 
 export function parseRawData(raw: string): LogData | null {
@@ -51,7 +53,7 @@ export function parseRawData(raw: string): LogData | null {
   const full = raw.substring(logEnd + 1, logEnd + 4) === "FUL";
   const log = DataLog.fromCSV(raw.substring(dataStart, dataStart + dataSize), full);
 
-  return { log, hash, dataSize, bytesRemaining, daplinkVersion };
+  return { log, hash, dataSize, bytesRemaining, daplinkVersion, standalone: false };
 }
 
 (function () {
@@ -77,7 +79,8 @@ export function parseRawData(raw: string): LogData | null {
       hash: 0,
       dataSize: 100,
       bytesRemaining: 100,
-      daplinkVersion: 0
+      daplinkVersion: 0,
+      standalone: false
     };
     data = null;
 
@@ -108,7 +111,7 @@ export function parseRawData(raw: string): LogData | null {
       // override this so we give a user a prompt if they want to reload rather than
       // immediately reloading
       onmessage = e => {
-        window.dispatchEvent(new CustomEvent("dl-update", {detail: e.data}));
+        window.dispatchEvent(new CustomEvent("dl-update", { detail: e.data }));
       };
 
       const reactRoot = document.createElement("div");
@@ -128,7 +131,9 @@ export function parseRawData(raw: string): LogData | null {
 
     root.render(
       //<React.StrictMode>
-      <LogDataProvider log={data} />
+      <ErrorHandler>
+        <LogDataProvider log={data} />
+      </ErrorHandler>
       //</React.StrictMode>
     );
   }
