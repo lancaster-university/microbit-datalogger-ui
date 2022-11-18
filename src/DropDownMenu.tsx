@@ -6,9 +6,15 @@ export interface DropDownMenuProps {
     onSelected?: (index: number) => any;
 }
 
+/**
+ * Drop down menu for use with DropDownButtons. Supports keyboard input.
+ * Does not automatically close if losing focus, but will attempt to focus itself
+ * when being displayed initially.
+ */
 export default function DropDownMenu(props: DropDownMenuProps) {
     const dropdownRef = useRef<HTMLDivElement>(null);
 
+    // try and make sure we're focused!
     useEffect(() => {
         const children = dropdownRef.current?.children;
         

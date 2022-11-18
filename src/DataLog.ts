@@ -1,3 +1,5 @@
+import { FieldType } from "./FieldTypes";
+
 /**
  * Contains data for one row of the data log. Each row may also be a header row, this will happen
  * if new headers are introduced after data has already been written to the log. The micro:bit data log
@@ -68,6 +70,14 @@ export default class DataLog {
         }
 
         return this.data.filter(row => !row.isHeading || !excludeHeaders).map(row => row.isHeading ? null : row.data[index]);
+    }
+
+    /**
+     * Returns the index of the first field which matches this field type. Returns -1 if no match found
+     * @param field the field type to lookup
+     */
+    public findFieldIndex(field: FieldType) {
+        return this.headers.findIndex(header => field.validator.test(header));
     }
 
     /**

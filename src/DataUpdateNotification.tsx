@@ -2,6 +2,11 @@ import { useState } from "react";
 import { RiRefreshLine } from "react-icons/ri";
 import "./DataUpdateNotification.css";
 
+/**
+ * Displays as floating notification whenever changes are detected on disk to the log data.
+ * Users can click the notification to dismiss it, and use the 'Update data' button to update the table and
+ * graphs to the latest data.
+ */
 export default function DataUpdateNotification({ visible }: { visible: boolean }) {
 
     const [ignored] = useState<boolean>(false);

@@ -34,7 +34,7 @@ td:not(:last-child) {
     border-right: thin solid #ddd;
 }
 
-tr :first-child {
+tr > :first-child {
     min-width: 4ch;
     width: 4ch;
     background: #f0f0f0;
@@ -58,4 +58,9 @@ tr:hover {
 
 tr:first-of-type {
     border-radius: 8px;
+}
+
+tr .icon {
+    transform: translateY(0.1em);
+    margin-right: 0.3em;
 }

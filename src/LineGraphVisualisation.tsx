@@ -4,13 +4,20 @@ import "./LineGraphVisualisation.css";
 import { RiLineChartLine } from "react-icons/ri";
 import Warning from "./Warning";
 import React, { Suspense } from 'react';
+import { TIME } from './FieldTypes';
 
 const Plot = React.lazy(() => import("react-plotly.js"));
 
-const MAX_GRAPHS = 5; // performance!
+const MAX_GRAPHS = 5; // performance! todo: make the user aware if unable to visualise all the data?
 
+/**
+ * Line graph visualisation. Available for data logs which have a timestamp heading,
+ * and at least 1 other column.
+ */
 function LineGraph({ log }: VisualisationProps) {
-    let splitLogs = log.split((row, prevRow) => !row.isHeading && !!prevRow && Number(row.data[0]) < Number(prevRow.data[0]));
+    const timestampFieldIndex = log.findFieldIndex(TIME);
+
+    let splitLogs = log.split((row, prevRow) => !row.isHeading && !!prevRow && Number(row.data[timestampFieldIndex]) < Number(prevRow.data[timestampFieldIndex]));
 
     const truncated = splitLogs.length > MAX_GRAPHS;
 
@@ -38,10 +45,10 @@ function LineGraph({ log }: VisualisationProps) {
             </Warning>
 
         }
-        {splitLogs.map(log => {
-            const graphX = log.dataForHeader(0, true);
+        {splitLogs.map(log => { // map each time range to a plotly graph
+            const graphX = log.dataForHeader(timestampFieldIndex, true);
 
-            const data: Data[] = log.headers.slice(1).map((header, index): Data => {
+            const data: Data[] = log.headers.filter((_, ix) => ix !== timestampFieldIndex).map((header, index): Data => {
                 return {
                     name: header,
                     type: "scatter",
@@ -71,7 +78,7 @@ function LineGraph({ log }: VisualisationProps) {
 
                             className="graph"
 
-                            layout={{ height: 500, margin: { l: 60, r: 60, t: 30, b: 70 }, xaxis: { title: log.headers[0] } }}
+                            layout={{ height: 500, margin: { l: 60, r: 60, t: 30, b: 70 }, xaxis: { title: log.headers[timestampFieldIndex] } }}
                             config={visualisationConfig}
                         />
                     </Suspense>
@@ -88,7 +95,9 @@ const LineGraphVisualisation: VisualisationType = {
             return "Requires two or more columns. Timestamps must be enabled.";
         }
 
-        if (!timestampRegex.test(log.headers[0])) {
+        const timestampColumn = log.findFieldIndex(TIME);
+
+        if (timestampColumn === -1) {
             return "Timestamps must be enabled when logging data.";
         }
 

@@ -4,6 +4,15 @@ import App from "./App";
 import DataLog from "./DataLog";
 import Modal from "./Modal";
 
+/**
+ * Wrapper around the main App component to supply the log data.
+ * If we're passed in non-null log data, this will be forwarded straight to
+ * App and we won't do anything else. Otherwise, we'll show a modal to allow
+ * users to select a CSV file.
+ * 
+ * There is no error handling in place currently, but the CSV parser is
+ * lenient regardless
+ */
 export default function LogDataProvider({log}: {log: LogData | null}) {
 
     const [logData, setLogData] = useState<LogData | null>(log);

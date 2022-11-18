@@ -5,20 +5,30 @@ import "./MapVisualisation.css";
 import { Data, Layout, PlotMarker } from "plotly.js";
 import { RiMap2Line } from "react-icons/ri";
 import Warning from "./Warning";
+import { LATITUDE, LONGITUDE } from "./FieldTypes";
 
 const Plot = React.lazy(() => import("react-plotly.js"));
 
-const latitudeColumn = "Latitude";
-const longitudeColumn = "Longitude";
-
+/**
+ * Map visualisation. Available for logs with a Latitude and Longitude column. The
+ * map view can also colour-code any column of the data log. e.g. temperature could
+ * be highlighted, where users could see at a glance which places are hotter or colder
+ * by the colour of their markers on the map.
+ * 
+ * Uses OpenStreetMap, so confirms with users whether they consent to loading any map
+ * tiles before any requests are sent to their servers.
+ */
 function Map({ log }: VisualisationProps) {
 
     const [mapConsent, setMapConsent] = useState(() => window.localStorage.getItem("open-street-map-consent") === "true");
     const [invalidCoords, setInvalidCoords] = useState(false);
 
-    const [visualiseColumn, setVisualiseColumn] = useState<string | null>(() => log.headers[0]);
+    const [visualiseColumn, setVisualiseColumn] = useState<string | null>(() => {
+        const firstNonLatLongHeader = log.headers.findIndex(header => !LATITUDE.validator.test(header) && !LONGITUDE.validator.test(header));
+        return firstNonLatLongHeader === -1 ? log.headers[0] : log.headers[firstNonLatLongHeader];
+    });
 
-    const [lats] = useState(() => log.dataForHeader(latitudeColumn, true).map(elem => Number(elem)).map(elem => {
+    const [lats] = useState(() => log.dataForHeader(log.findFieldIndex(LATITUDE), true).map(elem => Number(elem)).map(elem => {
         if (elem < -90 || elem > 90) {
             setInvalidCoords(true);
             return Math.min(90, Math.max(-90, elem));
@@ -27,7 +37,7 @@ function Map({ log }: VisualisationProps) {
         return elem;
     }));
 
-    const [lons] = useState(() => log.dataForHeader(longitudeColumn, true).map(elem => Number(elem)).map(elem => {
+    const [lons] = useState(() => log.dataForHeader(log.findFieldIndex(LONGITUDE), true).map(elem => Number(elem)).map(elem => {
         if (elem < -180 || elem > 180) {
             setInvalidCoords(true);
             return Math.min(180, Math.max(-180, elem));
@@ -99,7 +109,7 @@ function Map({ log }: VisualisationProps) {
         type: "scattermapbox",
         lat: lats,
         lon: lons,
-        text: lats.map((_, index) => log.headers.filter(header => header !== latitudeColumn && header !== longitudeColumn).map(heading => heading + ": " + log.dataForHeader(heading, true)[index]).join(", ")),
+        text: lats.map((_, index) => log.headers.filter(header => !LATITUDE.validator.test(header) && !LONGITUDE.validator.test(header)).map(heading => heading + ": " + log.dataForHeader(heading, true)[index]).join(", ")),
         marker,
         mode: "markers"
         /*mode: "lines+markers",
@@ -124,7 +134,7 @@ function Map({ log }: VisualisationProps) {
                     <label htmlFor="map-column-selector">Column to highlight</label>
                     <select id="map-column-selector" placeholder="Set column to visualise" onChange={e => setVisualiseColumn(e.target.value)}>
                         {log.headers.map(h =>
-                            <option key={h} value={h}>{h}</option>
+                            <option key={h} value={h} selected={visualiseColumn === h}>{h}</option>
                         )}
                     </select>
                 </div>
@@ -137,8 +147,8 @@ const MapVisualisation: VisualisationType = {
     name: "Map",
     icon: <RiMap2Line />,
     availablityError: log => {
-        const lats = log.dataForHeader(latitudeColumn, true);
-        const lngs = log.dataForHeader(longitudeColumn, true);
+        const lats = log.dataForHeader(log.findFieldIndex(LATITUDE), true);
+        const lngs = log.dataForHeader(log.findFieldIndex(LONGITUDE), true);
 
         if (lats.length === 0 || lngs.length === 0) {
             return "Latitude and Longitude columns are required.";

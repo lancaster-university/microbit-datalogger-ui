@@ -22,3 +22,9 @@ export const TIME: FieldType = {
     icon: <RiTimeLine/>,
     validator: /time \(.+\)/i
 };
+
+const FIELDS = [LATITUDE, LONGITUDE, TIME];
+
+export function detect(header: string): FieldType | null {
+    return FIELDS.find(field => field.validator.test(header)) || null;
+}

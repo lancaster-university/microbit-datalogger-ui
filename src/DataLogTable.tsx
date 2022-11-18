@@ -2,6 +2,7 @@ import React from "react";
 import { timestampRegex } from "./App";
 import DataLog from "./DataLog";
 import "./DataLogTable.css";
+import { detect, FieldType, TIME } from "./FieldTypes";
 
 export interface DataLogProps {
     log: DataLog;
@@ -32,7 +33,7 @@ function DataLogTable(props: DataLogProps) {
 
     const rows = [];
 
-    const highlightDiscontinuous = props.highlightDiscontinuousTimes && timestampRegex.test(headers[0]);
+    const highlightDiscontinuousIndex = props.highlightDiscontinuousTimes ? props.log.findFieldIndex(TIME) : -1;
 
     let prevRowTimestamp = 0;
 
@@ -47,19 +48,24 @@ function DataLogTable(props: DataLogProps) {
 
         let discontinuous = false;
 
-        if (highlightDiscontinuous) {
-            const firstRowValue = Number(rowData.data[0]);
+        if (highlightDiscontinuousIndex !== -1) {
+            const firstRowValue = Number(rowData.data[highlightDiscontinuousIndex]);
 
             // has time gone backwards??
-            discontinuous = firstRowValue < prevRowTimestamp;
+            discontinuous = firstRowValue < prevRowTimestamp && i !== 0;
             prevRowTimestamp = firstRowValue;
         }
 
-        rowData.data.forEach((data, index) => row.push(
-            <td key={index}>
-                {data ?? 'None'}
-            </td>
-        ));
+        rowData.data.forEach((data, index) => {
+            const formattedType: FieldType | null = rowData.isHeading && data ? detect(data) : null;
+            const icon = formattedType && formattedType.icon;
+
+            return row.push(
+                <td key={index}>
+                    {icon ?? ""}{data ?? ""}
+                </td>
+            );
+        });
 
         rows.push(<tr key={i} className={`${discontinuous ? 'discontinuous' : ''} ${rowData.isHeading ? 'header-row' : ''}`}>{row}</tr>);
     }

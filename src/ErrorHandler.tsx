@@ -9,6 +9,10 @@ interface ErrorHandlerState {
     errorMessage?: string;
 }
 
+/**
+ * Top level error handler to at least display a somewhat user-friendly message,
+ * rather than falling back to a white screen.
+ */
 // error boundaries don't yet support functional components
 export default class ErrorHandler extends React.Component<ErrorHandlerProps, ErrorHandlerState> {
 
