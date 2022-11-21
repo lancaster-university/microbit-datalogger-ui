@@ -42,7 +42,7 @@ export default class DataLog {
             return this.emptyLog;
         }
 
-        const rows = csv.replace("\r", "").split("\n").filter(row => row !== "");
+        const rows = csv.replaceAll("\r", "").replaceAll("\"", "").split("\n").filter(row => row !== "");
         const headers = rows[0].split(",");
         const data: DataLogRow[] = [];
 
