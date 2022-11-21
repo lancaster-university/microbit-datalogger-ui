@@ -1,5 +1,5 @@
 import { Data } from 'plotly.js';
-import { timestampRegex, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
+import { visualisationConfig, VisualisationProps, VisualisationType } from "./App";
 import "./LineGraphVisualisation.css";
 import { RiLineChartLine } from "react-icons/ri";
 import Warning from "./Warning";
@@ -38,10 +38,10 @@ function LineGraph({ log }: VisualisationProps) {
     let currentRow = 0;
 
     return (<div className="line-graph-vis-container">
-        {splitLogs.length > 0 &&
+        {splitLogs.length > 1 &&
 
             <Warning title="Split graphs">
-                <div>Your data has been split into multiple graphs as multiple time ranges have been found in the logged data. This may happen if you unplug or reset your micro:bit in between logging data.</div>
+                <div>Your data has been split into {splitLogs.length} graphs as multiple time ranges have been found in the logged data. This may happen if you unplug or reset your micro:bit in between logging data.</div>
             </Warning>
 
         }

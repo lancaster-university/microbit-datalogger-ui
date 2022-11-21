@@ -1,5 +1,4 @@
 import React from "react";
-import { timestampRegex } from "./App";
 import DataLog from "./DataLog";
 import "./DataLogTable.css";
 import { detect, FieldType, TIME } from "./FieldTypes";
@@ -28,7 +27,6 @@ const highlightRow = (e: React.MouseEvent<HTMLTableCellElement>) => {
 };
 
 function DataLogTable(props: DataLogProps) {
-    const headers = props.log.headers;
     const logLength = props.log.data.length;
 
     const rows = [];
@@ -62,7 +60,7 @@ function DataLogTable(props: DataLogProps) {
 
             return row.push(
                 <td key={index}>
-                    {icon ?? ""}{data ?? ""}
+                    {!!icon ? <span title={formattedType.name}>{icon}</span> : ""}{data ?? ""}
                 </td>
             );
         });

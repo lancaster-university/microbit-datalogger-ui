@@ -33,7 +33,13 @@
     transition: background linear 0.2s;
 }
 
-.dropdown-menu > div:hover, .dropdown-menu > div:focus {
+.dropdown-menu > div:focus {
+    background: #eee;
+    cursor: pointer;
+    outline: none;
+}
+
+.dropdown-menu > div:hover {
     background: #ddd;
     cursor: pointer;
     outline: none;

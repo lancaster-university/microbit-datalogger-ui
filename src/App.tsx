@@ -31,12 +31,11 @@ export interface VisualisationProps {
   log: DataLog;
 }
 
-export const timestampRegex = /Time \(.+\)/;
-
-export const visualisationConfig: Partial<Config> = { displaylogo: false, responsive: true, toImageButtonOptions: { filename: "MY_DATA" }, modeBarButtonsToRemove: ["select2d", "lasso2d", "autoScale2d"] }
+// standard plotly config
+export const visualisationConfig: Partial<Config> = { displaylogo: false, responsive: true, toImageButtonOptions: { filename: "MY_DATA" }, modeBarButtonsToRemove: ["select2d", "lasso2d", "autoScale2d"] };
 
 const visualisations: VisualisationType[] = [
-  LineGraphVisualisation, MapVisualisation
+  LineGraphVisualisation, MapVisualisation // add new visualisation configs here
 ];
 
 /**
@@ -48,7 +47,7 @@ interface ShareTarget {
   onShare: (log: DataLog) => any;
 }
 
-const shareTargets: ShareTarget[] = [
+const shareTargets: ShareTarget[] = [ // add new share targets here
   {
     name: "Download",
     icon: <RiDownload2Line />,
@@ -83,7 +82,7 @@ export default function App(props: LogData) {
   // the active visualisation, e.g. line graph or map view
   const [visualisation, setVisualisation] = useState<VisualisationType | null>(null);
   const [modal, setModal] = useState<ModalProps | null>(null);
-  const [updateAvailable, setUpdateAvailable] = useState<LogData | null>(null);
+  const [updateAvailable, setUpdateAvailable] = useState<{data: LogData | null, updateId: number}>({data: null, updateId: 0});
   const [logData, setLogData] = useState<LogData>(props);
 
   const log = logData.log;
@@ -97,7 +96,7 @@ export default function App(props: LogData) {
         // isn't aware of this it'll continuously inform us of updates to the original
         // data. so we just manually filter that out here.
         if (!!data && data.hash !== logData.hash) {
-          setUpdateAvailable(data);
+          setUpdateAvailable({data, updateId: updateAvailable.updateId + 1});
         }
       }
     }
@@ -125,9 +124,9 @@ export default function App(props: LogData) {
   }
 
   const updateData = () => {
-    if (updateAvailable) {
-      setLogData(updateAvailable);
-      setUpdateAvailable(null);
+    if (updateAvailable.data) {
+      setLogData(updateAvailable.data);
+      setUpdateAvailable({...updateAvailable, data: null});
       return;
     }
 
@@ -161,7 +160,7 @@ export default function App(props: LogData) {
       <div className="app">
         {modal && <Modal {...modal} />}
         <Header />
-        <DataUpdateNotification visible={!!updateAvailable} />
+        <DataUpdateNotification updateNum={updateAvailable.updateId} />
         <main>
           <h1>micro:bit data log</h1>
           <section className="buttons">

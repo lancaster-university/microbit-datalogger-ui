@@ -4,23 +4,27 @@ export interface FieldType {
 
     icon: JSX.Element;
     validator: RegExp;
+    name: string;
 }
 
 // todo how to localise?
 
 export const LATITUDE: FieldType = {
     icon: <RiCompassLine/>,
-    validator: /latitude/i
+    validator: /latitude/i,
+    name: "Latitude"
 };
 
 export const LONGITUDE: FieldType = {
     icon: <RiCompassLine/>,
-    validator: /longitude/i
+    validator: /longitude/i,
+    name: "Longitude"
 };
 
 export const TIME: FieldType = {
     icon: <RiTimeLine/>,
-    validator: /time \(.+\)/i
+    validator: /time \(.+\)/i,
+    name: "Timestamp"
 };
 
 const FIELDS = [LATITUDE, LONGITUDE, TIME];
