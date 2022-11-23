@@ -127,7 +127,8 @@ export default function App(props: LogData) {
     if (updateAvailable.data) {
       setLogData(updateAvailable.data);
       setUpdateAvailable({...updateAvailable, data: null});
-      return;
+
+      return <RiCheckLine/>;
     }
 
     showModal({ title: "No changes detected", content: <div>To see the latest data that changed after you opened this file, you must unplug your micro:bit and plug it back in.</div> });
