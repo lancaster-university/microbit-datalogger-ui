@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { RiFolderOpenLine } from "react-icons/ri";
+import { RiClipboardLine, RiFolderOpenLine } from "react-icons/ri";
 import { LogData } from ".";
 import DataLog from "./DataLog";
 import DataLogSource, { StandaloneDataLogSource } from "./DataLogSource";
@@ -49,11 +49,18 @@ export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProp
         recents && setRecents(recents);
     }, []);
 
+    const loadFromClipboard = () => {
+        navigator.clipboard.readText().then(text => {
+            loadStandalone({ title: "Data from clipboard", log: text });
+        });
+    };
+
     return (
         <div>
             You're using the datalogger in standalone mode. This allows you to load data directly from a CSV file.
             <div id="file-picker-wrapper">
-                <IconButton icon={<RiFolderOpenLine />} caption="Choose file" onClick={() => filePicker.current?.click()}/>
+                <IconButton icon={<RiFolderOpenLine />} caption="Choose file" onClick={() => filePicker.current?.click()} />
+                <IconButton icon={<RiClipboardLine />} caption="Load from clipboard" onClick={loadFromClipboard} />
                 <input type="file" ref={filePicker} onChange={loadFile} accept=".csv" />
             </div>
             <div id="data-samples-wrapper">

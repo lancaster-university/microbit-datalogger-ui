@@ -43,7 +43,7 @@ a:focus, button:focus {
 }
 
 #data > table {
-  align-self: flex-start;
+  align-self: flex-end;
 }
 
 #data > aside {
