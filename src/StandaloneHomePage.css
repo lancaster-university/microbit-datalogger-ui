@@ -1,0 +1,34 @@
+.sample-title {
+    font-weight: 600;
+}
+
+.data-samples {
+    flex: 1;
+    overflow: hidden;
+}
+
+#data-samples-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
+.sample-title {
+    padding-bottom: 0.25em;
+}
+
+#file-picker-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.8em;
+    margin-bottom: 1.8em;
+}
+
+#file-picker-wrapper button {
+    font-size: 1em;
+    min-height: 40px;
+}
+
+#file-picker-wrapper input {
+    display: none;
+}

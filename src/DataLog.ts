@@ -1,3 +1,4 @@
+import { LogData } from ".";
 import { FieldType } from "./FieldTypes";
 
 /**
@@ -143,5 +144,16 @@ export default class DataLog {
         splitLogs.push(new DataLog(this.headers, currentData, false));
 
         return splitLogs;
+    }
+
+    public asStandaloneLog(): LogData {
+        return ({
+            log: this,
+            bytesRemaining: 0,
+            daplinkVersion: 0,
+            dataSize: 0,
+            hash: 0,
+            standalone: true
+        });
     }
 }

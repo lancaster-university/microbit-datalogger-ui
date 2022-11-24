@@ -1,0 +1,17 @@
+.data-sample {
+    padding: 0.2em;
+    flex: 1;
+    display: flex;
+    padding: 0.65em 0.3em;
+    gap: 0.3em;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.data-sample:not(:last-child) {
+    border-bottom: thin #ddd solid;
+}
+
+.data-sample:hover {
+   background: #e0e0e0;
+}

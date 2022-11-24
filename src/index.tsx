@@ -6,6 +6,7 @@ import LogDataProvider from "./LogDataProvider";
 
 import "./index.css";
 import ErrorHandler from "./ErrorHandler";
+import { IconContext } from "react-icons";
 
 interface OfflineDataLog {
   download(): void;
@@ -139,9 +140,11 @@ export function parseRawData(raw: string): LogData | null {
 
     root.render(
       //<React.StrictMode>
-      <ErrorHandler>
-        <LogDataProvider log={data} />
-      </ErrorHandler>
+      <IconContext.Provider value={{ className: "icon" }}>
+        <ErrorHandler>
+          <LogDataProvider log={data} />
+        </ErrorHandler>
+      </IconContext.Provider>
       //</React.StrictMode>
     );
   }

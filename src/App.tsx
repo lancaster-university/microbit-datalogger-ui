@@ -9,7 +9,6 @@ import DropDownButton from './DropDownButton';
 import Modal, { ModalContents, ModalProps } from './Modal';
 import DataLog from './DataLog';
 import { RiCheckLine, RiClipboardLine, RiCloseLine, RiDeleteBin2Line, RiDownload2Line, RiRefreshLine, RiShareLine } from "react-icons/ri";
-import { IconContext } from 'react-icons';
 import Warning from './Warning';
 import { LogData, parseRawData } from '.';
 import DataUpdateNotification from './DataUpdateNotification';
@@ -95,7 +94,7 @@ export default function App(props: LogData) {
         // if we choose to update our data to the latest from disk, since the offline js
         // isn't aware of this it'll continuously inform us of updates to the original
         // data. so we just manually filter that out here.
-        if (!!data && data.hash !== logData.hash) {
+        if (!!data && data.hash !== logData.hash && (!updateAvailable.data || data.hash !== updateAvailable.data.hash)) {
           setUpdateAvailable({data, updateId: updateAvailable.updateId + 1});
         }
       }
@@ -157,7 +156,6 @@ export default function App(props: LogData) {
   };
 
   return (
-    <IconContext.Provider value={{ className: "icon" }}>
       <div className="app">
         {modal && <Modal {...modal} />}
         <Header />
@@ -193,6 +191,5 @@ export default function App(props: LogData) {
           </section>
         </main>
       </div>
-    </IconContext.Provider>
   );
 }

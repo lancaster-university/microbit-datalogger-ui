@@ -42,6 +42,10 @@ a:focus, button:focus {
   gap: 0.8em;
 }
 
+#data > table {
+  align-self: flex-start;
+}
+
 #data > aside {
   flex: 1;
 }
