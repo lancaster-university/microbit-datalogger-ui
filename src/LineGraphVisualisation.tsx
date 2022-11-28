@@ -5,6 +5,7 @@ import { RiLineChartLine } from "react-icons/ri";
 import Warning from "./Warning";
 import React, { Suspense } from 'react';
 import { TIME } from './FieldTypes';
+import { ReactComponent as TooltipImage } from "./resources/line.svg";
 
 const Plot = React.lazy(() => import("react-plotly.js"));
 
@@ -89,6 +90,8 @@ function LineGraph({ log }: VisualisationProps) {
 
 const LineGraphVisualisation: VisualisationType = {
     name: "Line Graph",
+    description: "Creates a graph mapping a time series against other columns in your data log",
+    tooltipImage: <TooltipImage/>,
     icon: <RiLineChartLine />,
     availablityError: log => {
         if (log.headers.length < 2) {

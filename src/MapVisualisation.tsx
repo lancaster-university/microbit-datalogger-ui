@@ -6,6 +6,7 @@ import { Data, Layout, PlotMarker } from "plotly.js";
 import { RiMap2Line } from "react-icons/ri";
 import Warning from "./Warning";
 import { LATITUDE, LONGITUDE } from "./FieldTypes";
+import { ReactComponent as TooltipImage } from "./resources/map.svg";
 
 const Plot = React.lazy(() => import("react-plotly.js"));
 
@@ -145,6 +146,8 @@ function Map({ log }: VisualisationProps) {
 
 const MapVisualisation: VisualisationType = {
     name: "Map",
+    description: "Visualises geographic data using markers on a map",
+    tooltipImage: <TooltipImage/>,
     icon: <RiMap2Line />,
     availablityError: log => {
         const lats = log.dataForHeader(log.findFieldIndex(LATITUDE), true);

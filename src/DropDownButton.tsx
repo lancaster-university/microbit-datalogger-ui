@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { RiMore2Fill } from "react-icons/ri";
 import "./Button.css";
-import DropDownMenu from "./DropDownMenu";
+import DropDownMenu, { DropDownEntry } from "./DropDownMenu";
 
 export interface ButtonProps {
     /**
-     * The contents of each secondary element of the button
+     * The contents of each secondary element of the button, and their
+     * corresponding tooltip data
      */
-    dropdown?: JSX.Element[];
+    dropdown?: DropDownEntry[];
     /**
      * The contents of the main section of the button
      */
@@ -62,12 +63,14 @@ export default function DropDownButton(props: ButtonProps) {
             <button className={"button-main " + (validDropdown ? "dropdown " : " ") + (props.primary ? "primary" : "")} onClick={handleMainButtonClick}>
                 {props.children}
             </button>
-            {validDropdown && 
-            <button className={"button-dropdown " + (dropdownOpen ? "open " : " ") + (props.primary ? "primary" : "")} onClick={() => setDropdownOpen(!dropdownOpen)}>
-                <RiMore2Fill/>
-            </button>
+            {validDropdown &&
+                <button className={"button-dropdown " + (dropdownOpen ? "open " : " ") + (props.primary ? "primary" : "")} onClick={() => setDropdownOpen(!dropdownOpen)}>
+                    <RiMore2Fill />
+                </button>
             }
-            {validDropdown && dropdownOpen && <DropDownMenu items={props.dropdown || []} onSelected={handleDropdownSelect}/>}
+            {validDropdown && dropdownOpen && <>
+                <DropDownMenu items={props.dropdown || []} onSelected={handleDropdownSelect}/>
+            </>}
         </div>
     );
 }

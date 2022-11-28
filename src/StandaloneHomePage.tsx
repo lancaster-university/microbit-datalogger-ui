@@ -4,7 +4,7 @@ import { LogData } from ".";
 import DataLog from "./DataLog";
 import DataLogSource, { StandaloneDataLogSource } from "./DataLogSource";
 import IconButton from "./IconButton";
-import { gpsData } from "./sample-data";
+import { gpsData, petTallyData } from "./sample-data";
 import "./StandaloneHomePage.css";
 
 export interface StandaloneHomePageProps {
@@ -40,6 +40,10 @@ export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProp
         {
             title: "GPS and temperature series",
             log: gpsData.toCSV()
+        },
+        {
+            title: "Pet tally",
+            log: petTallyData
         }
     ];
 
