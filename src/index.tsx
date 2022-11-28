@@ -94,7 +94,7 @@ export function parseRawData(raw: string): LogData | null {
         // don't immediately remove it, as we will fall back to it if we fail to load
         // for some reason. But we also don't want it visible as it'll cause visual
         // flicker when swapping between elements
-        offlineRoot.style.display = "none !important";
+        offlineRoot.style.display = "none";
       }
 
       // The base load method (embedded within CODAL) will store the raw log data in dl.raw.
