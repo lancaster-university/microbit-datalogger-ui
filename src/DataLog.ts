@@ -43,17 +43,40 @@ export default class DataLog {
             return this.emptyLog;
         }
 
-        const rows = csv.replaceAll("\r", "").replaceAll("\"", "").split("\n").filter(row => row !== "");
-        const headers = rows[0].split(",");
-        const data: DataLogRow[] = [];
+        const values = csv.replaceAll("\r", "").split("\n");
 
-        rows.forEach((row, index) => {
-            const cols = row.split(",");
+        // Make sure we parse quotes correctly!
+        const quotedValuesRegex = /"[^"]*"/g;
+        const data: DataLogRow[] = values.map((row, index) => {
+            // Skip empty rows
+            if (row.length === 0) {
+                return null;
+            }
 
-            data.push({ data: cols, isHeading: index === 0 });
-        });
+            const parsedRow: string[] = [];
+            let currentIndex = 0;
 
-        return new DataLog(headers, data, isFull);
+            let match = quotedValuesRegex.exec(row);
+
+            while (match != null) {
+                parsedRow.push(...row.slice(currentIndex, match.index).split(','));
+                parsedRow.push(match[0].slice(1, -1));
+
+                currentIndex = quotedValuesRegex.lastIndex;
+                match = quotedValuesRegex.exec(row);
+            }
+
+            parsedRow.push(...row.slice(currentIndex).split(','));
+
+            const dataLogRow: DataLogRow = {
+                data: parsedRow.filter(row => row.length !== 0),
+                isHeading: index === 0 || values[index - 1].length === 0,
+            };
+
+            return dataLogRow;
+        }).filter((elem): elem is DataLogRow => elem != null);
+
+        return new DataLog(data[0].data, data, isFull);
     }
 
     /**
