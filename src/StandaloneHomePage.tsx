@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { RiClipboardLine, RiFolderOpenLine } from "react-icons/ri";
+import React, { useEffect, useRef, useState } from "react";
+import { RiClipboardLine, RiFileWarningLine, RiFolderOpenLine } from "react-icons/ri";
 import { LogData } from ".";
 import DataLog from "./DataLog";
 import DataLogSource, { StandaloneDataLogSource } from "./DataLogSource";
@@ -15,6 +15,13 @@ export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProp
     const [recents, setRecents] = useState<StandaloneDataLogSource[]>([]);
 
     const filePicker = useRef<HTMLInputElement | null>(null);
+    const dropAreaRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const recents: StandaloneDataLogSource[] = JSON.parse(window.localStorage.getItem("recent-files") ?? '[]');
+
+        recents && setRecents(recents);
+    }, []);
 
     const loadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -47,20 +54,45 @@ export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProp
         }
     ];
 
-    useEffect(() => {
-        const recents: StandaloneDataLogSource[] = JSON.parse(window.localStorage.getItem("recent-files") ?? '[]');
-
-        recents && setRecents(recents);
-    }, []);
-
     const loadFromClipboard = () => {
         navigator.clipboard.readText().then(text => {
             loadStandalone({ title: "Data from clipboard", log: text });
         });
     };
 
+    const handleDrag = (event: React.DragEvent) => {
+        event.preventDefault();
+        dropAreaRef.current?.classList.add("highlight");
+    };
+
+    const handleDragLeave = () => {
+        dropAreaRef.current?.classList.remove("highlight");
+    };
+
+    const handleDrop = async (event: React.DragEvent) => {
+        event.preventDefault();
+
+        const files = event.dataTransfer.files;
+
+        if (files.length > 0) {
+            const file = files[0];
+            const data = await file.text();
+
+            loadStandalone({
+                title: file.name,
+                log: data
+            });
+        }
+
+        event.dataTransfer.clearData();
+    };
+
     return (
-        <div>
+        <div ref={dropAreaRef}
+            onDrop={handleDrop}
+            onDragOver={handleDrag}
+            onDragLeave={handleDragLeave}
+            className="standalone-root">
             You're using the datalogger in standalone mode. This allows you to load data directly from a CSV file.
             <div id="file-picker-wrapper">
                 <IconButton icon={<RiFolderOpenLine />} caption="Choose file" onClick={() => filePicker.current?.click()} />

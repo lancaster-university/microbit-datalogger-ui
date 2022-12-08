@@ -27,6 +27,7 @@ export interface ButtonProps {
      * to both button sections if so
      */
     primary?: boolean;
+    style?: React.CSSProperties;
 }
 
 /**
@@ -59,7 +60,7 @@ export default function DropDownButton(props: ButtonProps) {
     const validDropdown = props.dropdown && props.dropdown.length > 0;
 
     return (
-        <div className="button-wrapper" onBlur={handleBlur}>
+        <div className="button-wrapper" onBlur={handleBlur} style={props.style}>
             <button className={"button-main " + (validDropdown ? "dropdown " : " ") + (props.primary ? "primary" : "")} onClick={handleMainButtonClick}>
                 {props.children}
             </button>

@@ -1,7 +1,3 @@
-:root {
-    --primary-accent: #000;
-}
-
 body {
     font-family: Helvetica, Arial, sans-serif;
     margin: 0;
@@ -9,8 +5,8 @@ body {
 }
 
 .icon {
-    margin-right: 0.5em;
     min-width: 1em;
+    margin-right: 0.5em;
 }
 
 a {

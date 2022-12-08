@@ -54,7 +54,7 @@ export default function DropDownMenu(props: DropDownMenuProps) {
             <div className="dropdown-menu" ref={dropdownRef}>
                 {props.items.map((item, index) => <div tabIndex={0} onKeyDown={e => handleKeyDown(e, index)} onMouseOver={e => handleHover(e, index, true)} onMouseLeave={e => handleHover(e, index, false)} onClick={() => props.onSelected && props.onSelected(index)} key={index}>{item.element}</div>)}
             </div>
-            <ImageTooltip visible={tooltipVisible} x={tooltipX} y={tooltipY} data={tooltipData} />
+            <ImageTooltip calloutDirection="left" visible={tooltipVisible} x={tooltipX} y={tooltipY} data={tooltipData} />
         </>
-    )
+    );
 }

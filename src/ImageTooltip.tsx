@@ -11,13 +11,14 @@ export interface ImageTooltipProps {
     y: number;
     visible?: boolean;
     data?: ImageTooltipData;
+    calloutDirection: "left" | "up";
 }
 
 export default function ImageTooltip(props: ImageTooltipProps) {
     const translateStyle: React.CSSProperties = {transform: `translate(${props.x}px, ${props.y}px)`, opacity: props.visible ? 1 : 0, transition: `opacity 0.2s 0.1s, transform 0.1s`};
 
     return (
-        <div className="vs-tooltip" style={translateStyle}>
+        <div className={"vs-tooltip callout-" + props.calloutDirection} style={translateStyle}>
             <span className="vs-tooltip-callout"></span>
             <div className="vs-tooltip-text">
                 {props.data?.title}

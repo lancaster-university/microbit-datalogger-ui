@@ -59,14 +59,18 @@ export default class DataLog {
             let match = quotedValuesRegex.exec(row);
 
             while (match != null) {
-                parsedRow.push(...row.slice(currentIndex, match.index).split(','));
+                // Correctly parse quotes by manually splitting/reconstructing the
+                // values array where quotes are found by the regex
+                parsedRow.push(...row.slice(currentIndex, match.index).split(","));
                 parsedRow.push(match[0].slice(1, -1));
 
                 currentIndex = quotedValuesRegex.lastIndex;
                 match = quotedValuesRegex.exec(row);
             }
 
-            parsedRow.push(...row.slice(currentIndex).split(','));
+            // currentIndex indicates the last index of a " used in a value, so from
+            // this point on we can just split on commas as normal
+            parsedRow.push(...row.slice(currentIndex).split(","));
 
             const dataLogRow: DataLogRow = {
                 data: parsedRow.filter(row => row.length !== 0),

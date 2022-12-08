@@ -1,19 +1,36 @@
 .graph-span {
-
-    color: #777;
+    color: #444;
+    font-size: 1em;
+    display: flex;
 }
 
-.graph-span::before, .graph-span::after {
-    display: inline-block;
-    content: "";
-    border-top: 0.3em dashed;
-    width: 3em;
-    margin: 0 0.5em;
-    transform: translateY(-50%);
+.graph-row-info {
+    flex: 1;
 }
 
-.graph-span::after {
-    width: 18em;
+.graph-options {
+    display: flex;
+    gap: 0.5em;
+}
+
+.graph-expander .icon {
+    transition: all 0.1s ease-in-out;
+    transform-origin: 50% 45%;
+}
+
+.graph-expander.expanded .icon {
+    transform: rotate(180deg);
+}
+
+.graph-options button {
+    border: 0;
+    padding: 0.1em;
+    min-height: unset;
+    border-radius: 8px;
+}
+
+.graph-options .icon {
+    margin: 0;
 }
 
 .graph {
@@ -22,6 +39,21 @@
     -border: 2px solid #ccc;
     -border-radius: 3px;
     overflow: hidden;
+}
+
+.line-graph-container {
+    -border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 1em;
+    margin-bottom: 0.8em;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.22) 0px 3px 12px;
+}
+
+.line-graph-container > :last-child {
+    -padding-top: 1em;
 }
 
 .line-graph-vis-container {

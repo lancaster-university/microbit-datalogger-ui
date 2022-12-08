@@ -3,9 +3,11 @@ table {
     border-collapse: collapse;
     background: #ddd;
     overflow: hidden;
-    border: thin solid #ddd;
+    -border: thin solid #ddd;
     border-radius: 8px;
     margin-top: 0;
+    border: none;
+    box-shadow: rgba(0, 0, 0, 0.22) 0px 3px 12px;
 }
 
 .header-row {

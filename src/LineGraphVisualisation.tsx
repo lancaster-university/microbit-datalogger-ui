@@ -1,10 +1,10 @@
-import { Data } from 'plotly.js';
-import { visualisationConfig, VisualisationProps, VisualisationType } from "./App";
+import { Config, Data, Layout } from "plotly.js";
+import { layoutConfig, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
 import "./LineGraphVisualisation.css";
-import { RiLineChartLine } from "react-icons/ri";
+import { RiArrowDownLine, RiArrowDownSLine, RiFullscreenLine, RiLineChartLine } from "react-icons/ri";
 import Warning from "./Warning";
-import React, { Suspense } from 'react';
-import { TIME } from './FieldTypes';
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import { TIME } from "./FieldTypes";
 import { ReactComponent as TooltipImage } from "./resources/line.svg";
 
 const Plot = React.lazy(() => import("react-plotly.js"));
@@ -38,6 +38,8 @@ function LineGraph({ log }: VisualisationProps) {
 
     let currentRow = 0;
 
+    const layout = { ...layoutConfig, height: 500, xaxis: { title: { text: log.headers[timestampFieldIndex], standoff: 15 }, automargin: true }, yaxis: { automargin: true } };
+
     return (<div className="line-graph-vis-container">
         {splitLogs.length > 1 &&
 
@@ -61,7 +63,7 @@ function LineGraph({ log }: VisualisationProps) {
                     },
                     marker: {
                         // There are more than this but they look increasingly odd.
-                        symbol: (index - 1) % 24,
+                        symbol: 0// (index - 1) % 24,
                     },
                 };
             }
@@ -70,28 +72,117 @@ function LineGraph({ log }: VisualisationProps) {
             let rowFrom = currentRow + 1;
             let rowTo = (currentRow += log.data.length);
 
-            return (
-                <div key={rowFrom}>
-                    <div className="graph-span">Rows {rowFrom} - {rowTo}</div>
-                    <Suspense fallback={<div className="loading">Loading...</div>}>
-                        <Plot
-                            data={data}
-
-                            className="graph"
-
-                            layout={{ height: 500, margin: { l: 60, r: 60, t: 30, b: 70 }, xaxis: { title: log.headers[timestampFieldIndex] } }}
-                            config={visualisationConfig}
-                        />
-                    </Suspense>
-                </div>);
+            return <LineGraphElement key={rowFrom} rowFrom={rowFrom} rowTo={rowTo} data={data} layout={layout} config={visualisationConfig}/>
         })}
     </div>);
 };
 
+interface LineGraphElementProps {
+    data: Data[];
+    layout: Partial<Layout>;
+    config: Partial<Config>;
+    rowFrom: number;
+    rowTo: number;
+}
+
+function LineGraphElement(props: LineGraphElementProps) {
+    const [expanded, setExpanded] = useState(true);
+
+    const firstRender = useRef(true);
+    const selfRef = useRef<HTMLDivElement>(null);
+    const expandedContentRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (firstRender.current || isFullscreen()) {
+            firstRender.current = false;
+            return;
+        }
+
+        const contentElement = expandedContentRef.current;
+
+        if (!contentElement) {
+            return;
+        }
+    
+        if (expanded) {
+          // Animate expansion
+          contentElement.style.height = "auto";
+          contentElement.style.overflow = "hidden";
+          debugger;
+          //contentElement.style.height = "0";
+          contentElement.style.transition = "height 0.3s ease-in";
+    
+          requestAnimationFrame(() => {
+            const targetHeight = contentElement.offsetHeight;
+            contentElement.style.height = "0";
+
+            requestAnimationFrame(() => {
+                contentElement.style.height = `${targetHeight}px`;
+
+                setTimeout(() => {
+                   contentElement.style.height = "auto";
+                }, 300);
+            });
+          });
+        } else {
+          // Animate contraction
+          const height = contentElement.offsetHeight;
+          contentElement.style.height = `${height}px`;
+          contentElement.style.transition = "height 0.3s ease-out";
+    
+          requestAnimationFrame(() => {
+            contentElement.style.height = "0";
+          });
+        }
+      }, [expanded]);
+
+    const isFullscreen = () => !!document.fullscreenElement;
+
+    const expand = () => {
+        if (!(isFullscreen())) {
+            setExpanded(!expanded);
+        }
+    };
+
+    const fullscreen = () => {
+        if (isFullscreen()) {
+            document.exitFullscreen();
+        } else {
+            selfRef.current?.requestFullscreen();
+            setExpanded(true);
+        }
+    };
+
+    return (
+        <div ref={selfRef} className="line-graph-container">
+            <div className="graph-span">
+                <div className="graph-row-info">Rows {props.rowFrom} - {props.rowTo}</div>
+                <div className="graph-options">
+                    {document.fullscreenEnabled && <button onClick={fullscreen}><RiFullscreenLine /></button>}
+                    <button className={`graph-expander ${expanded ? "expanded" : ""}`} onClick={expand}><RiArrowDownSLine /></button>
+                </div>
+            </div>
+            <div ref={expandedContentRef} style={{height: isFullscreen() ? "100%" : undefined}}>
+            {true &&
+                <Suspense fallback={<div className="loading">Loading...</div>}>
+                    <Plot
+                        className="graph"
+
+                        data={props.data}
+                        layout={props.layout}
+                        config={props.config}
+                    />
+                </Suspense>
+            }
+            </div>
+        </div>
+    );
+}
+
 const LineGraphVisualisation: VisualisationType = {
     name: "Line Graph",
     description: "Creates a graph mapping a time series against other columns in your data log",
-    tooltipImage: <TooltipImage/>,
+    tooltipImage: <TooltipImage />,
     icon: <RiLineChartLine />,
     availablityError: log => {
         if (log.headers.length < 2) {
