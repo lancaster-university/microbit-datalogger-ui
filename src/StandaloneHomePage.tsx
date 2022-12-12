@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { RiClipboardLine, RiFileWarningLine, RiFolderOpenLine } from "react-icons/ri";
+import { RiClipboardLine, RiFolderOpenLine } from "react-icons/ri";
 import { LogData } from ".";
 import DataLog from "./DataLog";
 import DataLogSource, { StandaloneDataLogSource } from "./DataLogSource";
