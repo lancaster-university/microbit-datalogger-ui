@@ -101,6 +101,13 @@ a:focus, button:focus {
   }
 }*/
 
+.card {
+  border-radius: 8px;
+  padding: 1em;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.18) 0px 3px 12px;
+}
+
 @keyframes vis-appear {
   0% {
     opacity: 0;
@@ -111,4 +118,11 @@ a:focus, button:focus {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+select {
+  padding: 0.5em 0.4em;
+  border-radius: 0.375rem;
+  border: thin solid #ccc;
+  color: #333;
 }

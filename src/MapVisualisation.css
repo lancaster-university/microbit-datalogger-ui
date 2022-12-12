@@ -44,6 +44,7 @@
     flex-direction: column;
     border-radius: 8px;
     overflow: hidden;
+    padding: 0;
 }
 
 .graph-config {

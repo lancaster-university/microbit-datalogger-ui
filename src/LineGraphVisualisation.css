@@ -42,14 +42,9 @@
 }
 
 .line-graph-container {
-    -border: 2px solid #ccc;
-    border-radius: 8px;
-    padding: 1em;
     margin-bottom: 0.8em;
     display: flex;
     flex-direction: column;
-    background-color: white;
-    box-shadow: rgba(0, 0, 0, 0.22) 0px 3px 12px;
 }
 
 .line-graph-container > :last-child {

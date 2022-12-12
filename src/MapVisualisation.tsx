@@ -122,7 +122,7 @@ function Map({ log }: VisualisationProps) {
 
     return (
         <Suspense fallback={<div className="loading">Loading...</div>}>
-            <div className="map-vis-container">
+            <div className="map-vis-container card">
                 {invalidCoords &&
                     <Warning title="Invalid co-ordinate data">
                         <div>Some of the fields within the graph have been rounded as they contained invalid latitude or longitude values</div>

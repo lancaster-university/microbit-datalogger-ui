@@ -18,7 +18,7 @@ export default function MultiToggleButton(props: MultiToggleButtonProps) {
     const [selected, setSelected] = useState(-1);
 
     const selectButton = (index: number) => {
-        if (selected == index) {
+        if (selected === index) {
             // de-select
             props.onSelect && props.onSelect(null, -1);
             setSelected(-1);
@@ -31,7 +31,7 @@ export default function MultiToggleButton(props: MultiToggleButtonProps) {
     };
 
     const handleHover = (event: React.MouseEvent, index: number, mouseOver: boolean) => {
-        if (selected == index) {
+        if (selected === index) {
             setTooltipVisible(false);
             return;
         }
@@ -48,7 +48,7 @@ export default function MultiToggleButton(props: MultiToggleButtonProps) {
         <>
             <div className="multi-toggle-button" style={props.style}>
                 {props.entries.map((entry, index) =>
-                    <button className={index == selected ? "multi-toggle-button-active" : ""} onClick={() => selectButton(index)} onMouseOver={e => handleHover(e, index, true)} onMouseLeave={e => handleHover(e, index, false)}>
+                    <button className={index === selected ? "multi-toggle-button-active" : ""} onClick={() => selectButton(index)} onMouseOver={e => handleHover(e, index, true)} onMouseLeave={e => handleHover(e, index, false)}>
                         {entry.element}
                     </button>
                 )}

@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import Header from './Header';
 import DataLogTable from './DataLogTable';
 import { Config, Layout } from 'plotly.js';
 import LineGraphVisualisation from './LineGraphVisualisation';
@@ -8,7 +7,7 @@ import MapVisualisation from './MapVisualisation';
 import DropDownButton from './DropDownButton';
 import Modal, { ModalContents, ModalProps } from './Modal';
 import DataLog from './DataLog';
-import { RiCheckLine, RiClipboardLine, RiCloseLine, RiDeleteBin2Line, RiDownload2Line, RiQuestionAnswerLine, RiQuestionLine, RiRefreshLine, RiShareLine } from "react-icons/ri";
+import { RiCheckLine, RiClipboardLine, RiDeleteBin2Line, RiDownload2Line, RiQuestionLine, RiRefreshLine, RiShareLine } from "react-icons/ri";
 import Warning from './Warning';
 import { LogData, parseRawData } from '.';
 import DataUpdateNotification from './DataUpdateNotification';
@@ -216,14 +215,14 @@ export default function App(props: LogData) {
 
         for (const char of str) {
           if (lastLine == null) {
-            if (char == "\n") {
+            if (char === "\n") {
               lastLine = "";
             }
 
             break;
           }
 
-          if (char == "\n") {
+          if (char === "\n") {
             appendLogLine(lastLine);
             lastLine = "";
           } else {

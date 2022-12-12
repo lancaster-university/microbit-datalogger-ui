@@ -1,7 +1,7 @@
 import { Config, Data, Layout } from "plotly.js";
 import { layoutConfig, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
 import "./LineGraphVisualisation.css";
-import { RiArrowDownLine, RiArrowDownSLine, RiFullscreenLine, RiLineChartLine } from "react-icons/ri";
+import { RiArrowDownSLine, RiFullscreenLine, RiLineChartLine } from "react-icons/ri";
 import Warning from "./Warning";
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { TIME } from "./FieldTypes";
@@ -154,7 +154,7 @@ function LineGraphElement(props: LineGraphElementProps) {
     };
 
     return (
-        <div ref={selfRef} className="line-graph-container">
+        <div ref={selfRef} className="line-graph-container card">
             <div className="graph-span">
                 <div className="graph-row-info">Rows {props.rowFrom} - {props.rowTo}</div>
                 <div className="graph-options">

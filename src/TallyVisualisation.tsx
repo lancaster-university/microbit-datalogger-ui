@@ -2,7 +2,7 @@ import { Data } from "plotly.js";
 import React from "react";
 import { Suspense } from "react";
 import { RiBarChartLine } from "react-icons/ri";
-import { visualisationConfig, VisualisationProps, VisualisationType } from "./App";
+import { layoutConfig, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
 import { ReactComponent as TooltipImage } from "./resources/tally.svg";
 
 const Plot = React.lazy(() => import("react-plotly.js"));
@@ -29,14 +29,14 @@ function Tally({ log }: VisualisationProps) {
     };
 
     return (
-        <div>
+        <div className="card">
             <Suspense fallback={<div className="loading">Loading...</div>}>
                 <Plot
                     data={[data]}
 
                     className="graph"
 
-                    layout={{ height: 500, margin: { l: 60, r: 60, t: 30, b: 70 } }}
+                    layout={{...layoutConfig, height: 500, xaxis: { automargin: true }, yaxis: { automargin: true }  }}
                     config={visualisationConfig}
                 />
             </Suspense>

@@ -8,7 +8,7 @@ export interface WarningProps {
 
 export default function Warning(props: WarningProps) {
     return (
-        <div className="warning">
+        <div className="warning card">
             <RiInformationLine />
             <div>
                 <h3>{props.title}</h3>
