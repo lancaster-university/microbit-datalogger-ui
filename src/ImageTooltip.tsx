@@ -1,34 +1,29 @@
 import "./ImageTooltip.css";
 
-export interface ImageTooltipData {
+export interface ImageTooltipProps {
     title?: string;
-    image?: JSX.Element;
+    image?: React.ReactNode;
     description?: string;
 }
 
-export interface ImageTooltipProps {
-    x: number;
-    y: number;
-    visible?: boolean;
-    data?: ImageTooltipData;
-    calloutDirection: "left" | "up";
-}
-
 export default function ImageTooltip(props: ImageTooltipProps) {
-    const translateStyle: React.CSSProperties = {transform: `translate(${props.x}px, ${props.y}px)`, opacity: props.visible ? 1 : 0, transition: `opacity 0.2s 0.1s, transform 0.1s`};
-
     return (
-        <div className={"vs-tooltip callout-" + props.calloutDirection} style={translateStyle}>
-            <span className="vs-tooltip-callout"></span>
-            <div className="vs-tooltip-text">
-                {props.data?.title}
-            </div>
-            <div className="vs-image">
-                {props.data?.image}
-            </div>
-            <div className="vs-tooltip-desc">
-                {props.data?.description}
-            </div>
+        <div>
+            {props.title &&
+                <div>
+                    {props.title}
+                </div>
+            }
+            {props.image &&
+                <div className="image-tooltip-image">
+                    {props.image}
+                </div>
+            }
+            {props.description &&
+                <div>
+                    {props.description}
+                </div>
+            }
         </div>
     );
 }

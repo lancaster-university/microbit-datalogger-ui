@@ -3,6 +3,7 @@ import React from "react";
 import { Suspense } from "react";
 import { RiBarChartLine } from "react-icons/ri";
 import { layoutConfig, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
+import ExpandingCard from "./ExpandingCard";
 import { ReactComponent as TooltipImage } from "./resources/tally.svg";
 
 const Plot = React.lazy(() => import("react-plotly.js"));
@@ -29,18 +30,19 @@ function Tally({ log }: VisualisationProps) {
     };
 
     return (
-        <div className="card">
+        <ExpandingCard title={<><RiBarChartLine/>Totals of each column</>} displayFullscreenButton={true}>
             <Suspense fallback={<div className="loading">Loading...</div>}>
                 <Plot
                     data={[data]}
 
                     className="graph"
 
-                    layout={{...layoutConfig, height: 500, xaxis: { automargin: true }, yaxis: { automargin: true }  }}
+                    layout={{ ...layoutConfig, height: 500, xaxis: { automargin: true }, yaxis: { automargin: true } }}
                     config={visualisationConfig}
                 />
             </Suspense>
-        </div>);
+        </ExpandingCard>
+    );
 }
 
 const MapVisualisation: VisualisationType = {

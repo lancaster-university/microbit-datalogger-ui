@@ -6,12 +6,8 @@
     pointer-events: none;
 }
 
-#map-privacy-notice {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #fefefe;
+.map-consent {
     text-align: center;
-    padding: 0.8em;
 }
 
 .timeline-container {
@@ -48,11 +44,35 @@
 }
 
 .graph-config {
-    background: rgb(235, 235, 235);
-    border-top: thin solid #ddd;
-    padding: 1em;
+    border-bottom: thin solid #ddd;
+    padding: 0.4em;
+
+    display: flex;
 }
 
-#map-column-selector {
-    margin-left: 0.6em;
+.config-items-container {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 0.4em;
+}
+
+.config-item {
+    display: flex;
+    flex: 1;
+    background: #f4f4f4;
+    padding: 0.4em;
+    border-radius: 8px;
+    gap: 1em;
+    align-items: center;
+}
+
+.config-item label {
+    flex: 2;
+    text-align: right;
+}
+
+.config-item select {
+    flex: 1;
+    max-width: 15em;
 }

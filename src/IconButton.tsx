@@ -2,12 +2,12 @@ import { useState } from "react";
 import "./IconButton.css";
 
 export interface IconButtonProps {
-    icon?: JSX.Element;
+    icon?: React.ReactNode;
     caption: string;
     /**
      * Returning an icon element will swap out the current icon for 2 seconds with this icon
      */
-    onClick?: () => JSX.Element | void;
+    onClick?: () => React.ReactNode | void;
 }
 
 /**
@@ -18,10 +18,10 @@ export interface IconButtonProps {
  * This isn't the most configurable currently, but it doesn't really need to be at the moment.
  */
 export default function IconButton({ icon, caption, onClick }: IconButtonProps) {
-    const [overrideIcon, setOverrideIcon] = useState<JSX.Element | null>(null);
+    const [overrideIcon, setOverrideIcon] = useState<React.ReactNode | null>(null);
     const [className, setClassName] = useState("");
 
-    const switchIcon = (icon: JSX.Element | null) => {
+    const switchIcon = (icon: React.ReactNode | null) => {
         if (overrideIcon && icon) {
             return;
         }

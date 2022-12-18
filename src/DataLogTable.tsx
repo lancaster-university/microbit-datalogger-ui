@@ -36,7 +36,7 @@ function DataLogTable(props: DataLogProps) {
     let prevRowTimestamp = 0;
 
     for (let i = 0; i < logLength; i++) {
-        const row: JSX.Element[] = [];
+        const row: React.ReactNode[] = [];
 
         const rowData = props.log.data[i];
 

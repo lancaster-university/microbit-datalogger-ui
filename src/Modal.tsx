@@ -6,7 +6,7 @@ export interface ModalProps extends ModalContents {
 }
 
 export interface ModalContents {
-    content: JSX.Element;
+    content: React.ReactNode;
     title: string;
     hideCloseButton?: boolean;
 }

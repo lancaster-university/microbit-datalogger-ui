@@ -1,18 +1,15 @@
 import React, { useState } from "react";
 import { RiMore2Fill } from "react-icons/ri";
-import "./Button.css";
 import DropDownMenu, { DropDownEntry } from "./DropDownMenu";
+import "./Button.css";
+import Tooltip from "./Tooltip";
 
-export interface ButtonProps {
+export interface DropDownButtonProps {
     /**
      * The contents of each secondary element of the button, and their
      * corresponding tooltip data
      */
-    dropdown?: DropDownEntry[];
-    /**
-     * The contents of the main section of the button
-     */
-    children: React.ReactNode;
+    entries?: DropDownEntry[];
     /**
      * Event handler for clicking on the main action for this button
      */
@@ -35,7 +32,7 @@ export interface ButtonProps {
  * a primary action, and a list of secondary actions which can be accessed
  * by clicking on the ... icon
  */
-export default function DropDownButton(props: ButtonProps) {
+export default function DropDownButton(props: DropDownButtonProps) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     // close the menu if it loses focus
@@ -56,22 +53,34 @@ export default function DropDownButton(props: ButtonProps) {
         props.onClick && props.onClick();
     };
 
+    if (!props.entries) {
+        return <></>;
+    }
+
+    const firstEntry = props.entries.length > 0 ? props.entries[0] : null;
+
     // if we don't have any dropdown entries, just render as a normal button
-    const validDropdown = props.dropdown && props.dropdown.length > 0;
+    const validDropdown = props.entries.length > 1;
 
     return (
         <div className="button-wrapper" onBlur={handleBlur} style={props.style}>
-            <button className={"button-main " + (validDropdown ? "dropdown " : " ") + (props.primary ? "primary" : "")} onClick={handleMainButtonClick}>
-                {props.children}
-            </button>
+            {firstEntry &&
+                <Tooltip content={firstEntry.tooltip}>
+                    <button className={"button-main " + (validDropdown ? "dropdown " : " ") + (props.primary ? "primary" : "")} onClick={handleMainButtonClick}>
+                        {firstEntry.element}
+                    </button>
+                </Tooltip>
+            }
+
             {validDropdown &&
                 <button className={"button-dropdown " + (dropdownOpen ? "open " : " ") + (props.primary ? "primary" : "")} onClick={() => setDropdownOpen(!dropdownOpen)}>
                     <RiMore2Fill />
                 </button>
             }
-            {validDropdown && dropdownOpen && <>
-                <DropDownMenu items={props.dropdown || []} onSelected={handleDropdownSelect}/>
-            </>}
+
+            {validDropdown && dropdownOpen &&
+                <DropDownMenu items={props.entries.slice(1)} onSelected={handleDropdownSelect} />
+            }
         </div>
     );
 }

@@ -6,16 +6,20 @@
     margin-right: 1px;
 }
 
-.multi-toggle-button :first-child:not(:last-child) {
+.multi-toggle-button button:active, .multi-toggle-button button:focus {
+    z-index: 1; /* keep the outline in front */
+}
+
+.multi-toggle-button :first-child:not(:last-child) button {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-.multi-toggle-button :not(:first-child):not(:last-child) {
+.multi-toggle-button :not(:first-child):not(:last-child) button {
     border-radius: 0;
 }
 
-.multi-toggle-button :last-child:not(:first-child) {
+.multi-toggle-button :last-child:not(:first-child) button {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }

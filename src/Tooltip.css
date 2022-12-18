@@ -1,0 +1,58 @@
+.tooltip-wrapper {
+    display: inline-block;
+    position: relative;
+}
+
+.tooltip-tip {
+    --tooltip-callout-size: 6px;
+    --tooltip-margin: 1px;
+    --tooltip-background-color: #2e2e2e;
+
+    position: absolute;
+    border-radius: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.3em 0.45em;
+    color: #fcfcfc;
+    background: var(--tooltip-background-color);
+    pointer-events: none;
+    white-space: pre;
+    transition: all 0.15s;
+    transform-origin: 0% 100%;
+    z-index: 1;
+}
+
+.tooltip-appear {
+    scale: 100%;
+}
+
+.tooltip-disappear {
+    scale: 90%;
+    opacity: 0;
+}
+
+.tooltip-tip::before {
+    content: "";
+    left: 50%;
+    border: var(--tooltip-callout-size) solid transparent;
+    position: absolute;
+    margin-left: calc(var(--tooltip-callout-size) * -1);
+}
+
+.tooltip-tip.up {
+    bottom: calc(100% + var(--tooltip-callout-size) + var(--tooltip-margin));
+}
+
+.tooltip-tip.up::before {
+    top: 100%;
+    border-top-color: var(--tooltip-background-color);
+}
+
+.tooltip-tip.down {
+    top: calc(100% + var(--tooltip-callout-size) + var(--tooltip-margin));
+}
+
+.tooltip-tip.down::before {
+    bottom: 100%;
+    border-bottom-color: var(--tooltip-background-color);
+}

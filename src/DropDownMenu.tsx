@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./DropDownMenu.css";
-import ImageTooltip, { ImageTooltipData } from "./ImageTooltip";
+import Tooltip from "./Tooltip";
 
 export interface DropDownEntry {
-    element: JSX.Element;
-    tooltip?: ImageTooltipData;
+    element: React.ReactNode;
+    tooltip?: React.ReactNode;
 }
 
 export interface DropDownMenuProps {
     items: DropDownEntry[];
     onSelected?: (index: number) => any;
+    onClose?: () => any;
 }
 
 /**
@@ -18,12 +19,19 @@ export interface DropDownMenuProps {
  * when being displayed initially.
  */
 export default function DropDownMenu(props: DropDownMenuProps) {
-    const [tooltipX, setTooltipX] = useState(0);
-    const [tooltipY, setTooltipY] = useState(0);
-    const [tooltipData, setTooltipData] = useState<ImageTooltipData | undefined>();
-    const [tooltipVisible, setTooltipVisible] = useState(false);
-
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleDocumentClick = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                // todo
+            }
+        };
+        document.addEventListener("click", handleDocumentClick);
+        return () => {
+            document.removeEventListener("click", handleDocumentClick);
+        };
+    });
 
     // try and make sure we're focused!
     useEffect(() => {
@@ -40,21 +48,15 @@ export default function DropDownMenu(props: DropDownMenuProps) {
         }
     };
 
-    const handleHover = (event: React.MouseEvent, index: number, mouseOver: boolean) => {
-        const data = props.items[index].tooltip;
-        mouseOver && setTooltipData(data); // over = mouse is over element
-        setTooltipVisible(mouseOver && !!data);
-        const pos = event.currentTarget.getBoundingClientRect();
-        setTooltipX(pos.right);
-        setTooltipY(pos.y - 10);
-    };
-
     return (
-        <>
-            <div className="dropdown-menu" ref={dropdownRef}>
-                {props.items.map((item, index) => <div tabIndex={0} onKeyDown={e => handleKeyDown(e, index)} onMouseOver={e => handleHover(e, index, true)} onMouseLeave={e => handleHover(e, index, false)} onClick={() => props.onSelected && props.onSelected(index)} key={index}>{item.element}</div>)}
-            </div>
-            <ImageTooltip calloutDirection="left" visible={tooltipVisible} x={tooltipX} y={tooltipY} data={tooltipData} />
-        </>
+        <div className="dropdown-menu" ref={dropdownRef}>
+            {
+                props.items.map((item, index) =>
+                    <Tooltip content={item.tooltip}>
+                        <div tabIndex={0} onKeyDown={e => handleKeyDown(e, index)} onClick={() => props.onSelected && props.onSelected(index)} key={index}>{item.element}</div>
+                    </Tooltip>
+                )
+            }
+        </div>
     );
 }

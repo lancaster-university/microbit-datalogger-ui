@@ -1,14 +1,17 @@
-import { visualisationConfig, VisualisationProps, VisualisationType } from "./App";
+import { layoutConfig, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
 import { Suspense, useState } from "react";
 import React from "react";
 import "./MapVisualisation.css";
 import { Data, Layout, PlotMarker } from "plotly.js";
-import { RiMap2Line } from "react-icons/ri";
+import { RiMap2Line, RiSettings2Line } from "react-icons/ri";
 import Warning from "./Warning";
 import { LATITUDE, LONGITUDE } from "./FieldTypes";
 import { ReactComponent as TooltipImage } from "./resources/map.svg";
+import ExpandingCard from "./ExpandingCard";
 
 const Plot = React.lazy(() => import("react-plotly.js"));
+
+type MarkerType = "markers" | "lines+markers" | "lines";
 
 /**
  * Map visualisation. Available for logs with a Latitude and Longitude column. The
@@ -23,11 +26,11 @@ function Map({ log }: VisualisationProps) {
 
     const [mapConsent, setMapConsent] = useState(() => window.localStorage.getItem("open-street-map-consent") === "true");
     const [invalidCoords, setInvalidCoords] = useState(false);
-
     const [visualiseColumn, setVisualiseColumn] = useState<string | null>(() => {
         const firstNonLatLongHeader = log.headers.findIndex(header => !LATITUDE.validator.test(header) && !LONGITUDE.validator.test(header));
         return firstNonLatLongHeader === -1 ? log.headers[0] : log.headers[firstNonLatLongHeader];
     });
+    const [markerType, setMarkerType] = useState<MarkerType>("markers");
 
     const [lats] = useState(() => log.dataForHeader(log.findFieldIndex(LATITUDE), true).map(elem => Number(elem)).map(elem => {
         if (elem < -90 || elem > 90) {
@@ -48,22 +51,23 @@ function Map({ log }: VisualisationProps) {
     }));
 
     const [layout] = useState<Partial<Layout>>(() => ({
+        ...layoutConfig,
         dragmode: "zoom",
         mapbox: {
             style: "open-street-map",
             center: { lat: lats.length === 0 ? 0 : lats[0], lon: lons.length === 0 ? 0 : lons[0] },
             zoom: 16
         },
-        height: 600,
+        height: 620,
         margin: { r: 0, t: 0, b: 0, l: 0 }
     }));
 
     if (!mapConsent) {
         return (
-            <div id="map-privacy-notice">
+            <div className="card map-consent">
                 <div>
                     <h3>Using the map view requires accessing data from OpenStreetMap</h3>
-                    You can view their privacy policy <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy">here</a>.
+                    You can view their privacy policy <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noreferrer">here</a>.
                 </div>
 
                 <div className="modal-buttons">
@@ -112,7 +116,7 @@ function Map({ log }: VisualisationProps) {
         lon: lons,
         text: lats.map((_, index) => log.headers.filter(header => !LATITUDE.validator.test(header) && !LONGITUDE.validator.test(header)).map(heading => heading + ": " + log.dataForHeader(heading, true)[index]).join(", ")),
         marker,
-        mode: "markers"
+        mode: markerType
         /*mode: "lines+markers",
         line: {
             width: 3,
@@ -121,33 +125,48 @@ function Map({ log }: VisualisationProps) {
     };
 
     return (
-        <Suspense fallback={<div className="loading">Loading...</div>}>
-            <div className="map-vis-container card">
-                {invalidCoords &&
-                    <Warning title="Invalid co-ordinate data">
-                        <div>Some of the fields within the graph have been rounded as they contained invalid latitude or longitude values</div>
-                    </Warning>
-                }
+        <>
+            {invalidCoords &&
+                <Warning title="Invalid co-ordinate data">
+                    <div>Some of the fields within the graph have been rounded as they contained invalid latitude or longitude values</div>
+                </Warning>
+            }
 
-                <Plot className="graph map" data={[data]} layout={layout} config={visualisationConfig} />
+            <ExpandingCard title={<><RiMap2Line />Map</>} displayFullscreenButton={true}>
+                <Suspense fallback={<div className="loading">Loading...</div>}>
+                    <Plot className="graph map" data={[data]} layout={layout} config={visualisationConfig} />
 
-                <div className="graph-config">
-                    <label htmlFor="map-column-selector">Column to highlight</label>
-                    <select id="map-column-selector" placeholder="Set column to visualise" onChange={e => setVisualiseColumn(e.target.value)}>
-                        {log.headers.map(h =>
-                            <option key={h} value={h} selected={visualiseColumn === h}>{h}</option>
-                        )}
-                    </select>
-                </div>
-            </div>
-        </Suspense>
+                    <div className="graph-config">
+                        <div><RiSettings2Line /></div>
+                        <div className="config-items-container">
+                            <div className="config-item">
+                                <label htmlFor="map-column-selector">Colour by column</label>
+                                <select id="map-column-selector" placeholder="Set column to visualise" onChange={e => setVisualiseColumn(e.target.value)} disabled={markerType === "lines"} defaultValue={visualiseColumn || undefined}>
+                                    {log.headers.map(h =>
+                                        <option key={h} value={h}>{h}</option>
+                                    )}
+                                </select>
+                            </div>
+                            <div className="config-item">
+                                <label htmlFor="map-marker-selector">Marker type</label>
+                                <select id="map-marker-selector" placeholder="Set column to visualise" onChange={e => setMarkerType(e.target.value as MarkerType)} defaultValue={markerType}>
+                                    <option value={"markers"}>Markers</option>
+                                    <option value={"lines"}>Lines</option>
+                                    <option value={"lines+markers"}>Markers and Lines</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </Suspense>
+            </ExpandingCard>
+        </>
     );
 }
 
 const MapVisualisation: VisualisationType = {
     name: "Map",
     description: "Visualises geographic data using markers on a map",
-    tooltipImage: <TooltipImage/>,
+    tooltipImage: <TooltipImage />,
     icon: <RiMap2Line />,
     availablityError: log => {
         const lats = log.dataForHeader(log.findFieldIndex(LATITUDE), true);

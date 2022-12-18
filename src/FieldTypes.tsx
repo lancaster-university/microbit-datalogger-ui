@@ -2,7 +2,7 @@ import { RiCompassLine, RiTimeLine } from "react-icons/ri";
 
 export interface FieldType {
 
-    icon: JSX.Element;
+    icon: React.ReactNode;
     validator: RegExp;
     name: string;
 }
