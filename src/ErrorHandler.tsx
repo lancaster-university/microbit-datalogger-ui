@@ -1,5 +1,4 @@
 import React, { ReactNode } from "react";
-import "./ErrorHandler.css";
 
 interface ErrorHandlerProps {
     children?: ReactNode;
@@ -33,7 +32,7 @@ export default class ErrorHandler extends React.Component<ErrorHandlerProps, Err
     render() {
         if (this.state.errorMessage) {
             return (
-                <div className="react-error">
+                <div style={{textAlign: "center"}}>
                     <h3>An error occurred displaying the data log</h3>
                     <p>Please try refreshing the page and trying again</p>
                     <p>Error message: {this.state.errorMessage}</p>

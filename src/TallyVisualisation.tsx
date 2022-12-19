@@ -1,12 +1,10 @@
 import { Data } from "plotly.js";
 import React from "react";
-import { Suspense } from "react";
 import { RiBarChartLine } from "react-icons/ri";
 import { layoutConfig, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
 import ExpandingCard from "./ExpandingCard";
+import PlotWrapper from "./PlotWrapper";
 import { ReactComponent as TooltipImage } from "./resources/tally.svg";
-
-const Plot = React.lazy(() => import("react-plotly.js"));
 
 function Tally({ log }: VisualisationProps) {
     const values: { [header: string]: number } = {};
@@ -30,17 +28,12 @@ function Tally({ log }: VisualisationProps) {
     };
 
     return (
-        <ExpandingCard title={<><RiBarChartLine/>Totals of each column</>} displayFullscreenButton={true}>
-            <Suspense fallback={<div className="loading">Loading...</div>}>
-                <Plot
-                    data={[data]}
-
-                    className="graph"
-
-                    layout={{ ...layoutConfig, height: 500, xaxis: { automargin: true }, yaxis: { automargin: true } }}
-                    config={visualisationConfig}
-                />
-            </Suspense>
+        <ExpandingCard title={<><RiBarChartLine />Totals of each column</>} displayFullscreenButton={true}>
+            <PlotWrapper
+                data={[data]}
+                layout={{ ...layoutConfig, height: 500, xaxis: { automargin: true }, yaxis: { automargin: true } }}
+                config={visualisationConfig}
+            />
         </ExpandingCard>
     );
 }

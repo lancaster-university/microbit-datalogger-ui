@@ -20,6 +20,7 @@
     transition: all 0.15s;
     transform-origin: 0% 100%;
     z-index: 1;
+    font-weight: unset;
 }
 
 .tooltip-appear {

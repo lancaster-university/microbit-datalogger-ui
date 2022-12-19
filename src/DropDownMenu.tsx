@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
-import "./DropDownMenu.css";
-import Tooltip from "./Tooltip";
+import { keyframes } from "@emotion/react";
+import styled from "@emotion/styled";
+import React, { useEffect, useRef } from "react";
 
 export interface DropDownEntry {
     element: React.ReactNode;
-    tooltip?: React.ReactNode;
+    tooltip?: string;
 }
 
 export interface DropDownMenuProps {
@@ -12,6 +12,49 @@ export interface DropDownMenuProps {
     onSelected?: (index: number) => any;
     onClose?: () => any;
 }
+
+const dropdownAppearKeyframes = keyframes`
+    0% {
+        transform: scale(0.9) translateY(-10px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+`;
+
+const Menu = styled.div`
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    margin-top: 3px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 12px;
+    overflow: hidden;
+    padding: 0.3em 0;
+    animation: ${dropdownAppearKeyframes} 0.18s ease-out;
+
+    & div {
+        padding: 0.5em 0.5em;
+        display: flex;
+        transition: background-color linear 0.2s;
+    }
+
+    & div:focus {
+        background: #eee;
+        cursor: pointer;
+        outline: none;
+    }
+
+    & div:hover {
+        background: #ddd;
+        cursor: pointer;
+        outline: none;
+    }
+`;
 
 /**
  * Drop down menu for use with DropDownButtons. Supports keyboard input.
@@ -49,14 +92,12 @@ export default function DropDownMenu(props: DropDownMenuProps) {
     };
 
     return (
-        <div className="dropdown-menu" ref={dropdownRef}>
+        <Menu ref={dropdownRef}>
             {
                 props.items.map((item, index) =>
-                    <Tooltip content={item.tooltip}>
-                        <div tabIndex={0} onKeyDown={e => handleKeyDown(e, index)} onClick={() => props.onSelected && props.onSelected(index)} key={index}>{item.element}</div>
-                    </Tooltip>
+                    <div key={index} title={item.tooltip} tabIndex={0} onKeyDown={e => handleKeyDown(e, index)} onClick={() => props.onSelected && props.onSelected(index)}>{item.element}</div>
                 )
             }
-        </div>
+        </Menu>
     );
 }

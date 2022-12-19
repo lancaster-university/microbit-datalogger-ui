@@ -1,22 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
-import './App.css';
-import DataLogTable from './DataLogTable';
-import { Config, Layout } from 'plotly.js';
-import LineGraphVisualisation from './LineGraphVisualisation';
-import MapVisualisation from './MapVisualisation';
-import DropDownButton from './DropDownButton';
-import Modal, { ModalContents, ModalProps } from './Modal';
-import DataLog from './DataLog';
+import { useEffect, useRef, useState } from "react";
+import DataLogTable from "./DataLogTable";
+import { Config, Layout } from "plotly.js";
+import LineGraphVisualisation from "./LineGraphVisualisation";
+import MapVisualisation from "./MapVisualisation";
+import DropDownButton from "./DropDownButton";
+import Modal, { ModalContents, ModalProps } from "./Modal";
+import DataLog from "./DataLog";
 import { RiCheckLine, RiClipboardLine, RiDeleteBin2Line, RiDownload2Line, RiQuestionLine, RiRefreshLine, RiShareLine } from "react-icons/ri";
-import Warning from './Warning';
-import { LogData, parseRawData } from '.';
-import DataUpdateNotification from './DataUpdateNotification';
-import IconButton from './IconButton';
-import TallyVisualisation from './TallyVisualisation';
-import MultiToggleButton from './MultiToggleButton';
-import Tooltip from './Tooltip';
+import Warning from "./Warning";
+import { LogData, parseRawData } from ".";
+import DataUpdateNotification from "./DataUpdateNotification";
+import IconButton from "./IconButton";
+import TallyVisualisation from "./TallyVisualisation";
+import MultiToggleButton from "./MultiToggleButton";
+import Tooltip from "./Tooltip";
 import { ReactComponent as MicrobitLogo } from "./resources/microbit-logo.svg";
-import ImageTooltip from './ImageTooltip';
+import BrowserWarning from "./BrowserWarning";
+import styled from "@emotion/styled";
+import { keyframes } from "@emotion/react";
 
 /**
  * Visualisations are the context-specific ways of presenting data in the data log.
@@ -61,7 +62,7 @@ const visualisations: VisualisationType[] = [
 ];
 
 /**
- * Share targets are ways of exporting the data from the data log, aside from the manual 'copy' option
+ * Share targets are ways of exporting the data from the data log, aside from the manual "copy" option
  */
 interface ShareTarget {
   name: string;
@@ -99,6 +100,81 @@ const shareTargets: ShareTarget[] = [ // add new share targets here
   }
 ];
 
+const AppWrapper = styled.div`
+  margin: 0;
+  display: grid;
+  background-image: linear-gradient(to bottom, #eee, #eee);
+`;
+
+const Header = styled.header`
+  background-color: #222;
+  padding: 1em;
+  background-image: linear-gradient(99deg, #6c4bc1, #7bcdc2 98%);
+
+  h1, h3 {
+    color: white;
+    margin: 0;
+  }
+
+  h3 {
+    font-weight: 400;
+    padding: 0.5em 0 0.8em 0;
+    max-width: 1000px;
+  }
+`;
+
+const MicrobitLogoWrapper = styled.a`
+  float: right;
+`;
+
+const ButtonsWrapper = styled.div`
+  display: flex;
+  position: sticky;
+  top: 0.5em;
+  z-index: 1; /*to stick above plotly graphs*/
+  gap: 0.6em;
+
+  button {
+    border: 0;
+  }
+`;
+
+const DataWrapper = styled.main`
+  display: flex;
+  flex-flow: row wrap-reverse !important;
+  gap: 0.8em;
+  margin: 1em;
+
+  > table {
+    align-self: flex-end;
+  }
+
+  > aside {
+    flex: 1;
+  }
+
+  > aside:empty {
+    display: none; /* fixes empty gap on small screens */
+  }
+`;
+
+const visualisationAppearKeyframes = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const VisualisationWrapper = styled.div`
+  min-width: 400px;
+  animation: ${visualisationAppearKeyframes} 0.3s;
+`;
+
 /**
  * Root component for the data log
  */
@@ -123,7 +199,7 @@ export default function App(props: LogData) {
         const data = parseRawData(e.detail);
 
         // if we choose to update our data to the latest from disk, since the offline js
-        // isn't aware of this it'll continuously inform us of updates to the original
+        // isn"t aware of this it"ll continuously inform us of updates to the original
         // data. so we just manually filter that out here.
         if (!!data && data.hash !== logData.hash && (!updateAvailable || data.hash !== updateAvailable.hash)) {
           setUpdateAvailable(data);
@@ -148,7 +224,7 @@ export default function App(props: LogData) {
 
   // the available visual previews for our data log. e.g. map view is not applicable when there
   // is no latitude or longitude fields detected.
-  // todo: visually present the reasons why certain visualisations aren't available
+  // todo: visually present the reasons why certain visualisations aren"t available
   const visualPreviews = visualisations.filter(vis => !vis.availablityError(log));
 
   const copy = () => {
@@ -246,15 +322,16 @@ export default function App(props: LogData) {
   };
 
   return (
-    <div className="app">
+    <AppWrapper>
+      <BrowserWarning />
       {modal && <Modal {...modal} />}
 
       <DataUpdateNotification visible={updateNotificationVisible} onClose={() => setUpdateNotificationVisible(false)} />
 
-      <header>
-        <a className="ubit-logo" href="https://microbit.org" target="_blank" rel="noreferrer">
+      <Header>
+        <MicrobitLogoWrapper href="https://microbit.org" target="_blank" rel="noreferrer">
           <MicrobitLogo />
-        </a>
+        </MicrobitLogoWrapper>
 
         <h1>micro:bit data log</h1>
         <h3>
@@ -262,7 +339,7 @@ export default function App(props: LogData) {
           You can copy and paste your data, or download it as a CSV file which you can import into a spreadsheet or graphing tool.
         </h3>
 
-        <section className="buttons">
+        <ButtonsWrapper>
           {
             /* Share targets */
             shareTargets.length > 0 &&
@@ -301,32 +378,30 @@ export default function App(props: LogData) {
               entries={visualPreviews.map(vis => (
                 {
                   element: <>{vis.icon}{vis.name}</>,
-                  tooltip: <ImageTooltip description={vis.description} image={vis.tooltipImage} />
+                  tooltip: vis.description //<ImageTooltip description={vis.description} image={vis.tooltipImage} />
                 }
               ))}
               onSelect={(_, index) => visualise(index)} />
           }
-        </section>
-      </header>
+        </ButtonsWrapper>
+      </Header>
 
-      <main>
-        <section id="data">
-          <DataLogTable log={log} highlightDiscontinuousTimes={visualisation === LineGraphVisualisation} />
-          <aside>
-            {log.isFull &&
-              <Warning title="Log is full">
-                You won't be able to log any more data until the log is cleared. <a href="https://support.microbit.org/support/solutions/articles/19000127516-what-to-do-when-the-data-log-is-full" target="_blank" rel="noreferrer">Learn more</a>.
-              </Warning>
-            }
-            {log.isEmpty &&
-              <Warning title="Log is empty">
-                You haven't logged any data yet. Click the link above to learn more about how to log data on the micro:bit.
-              </Warning>
-            }
-            {visualisation && <section id="visualisation">{visualisation.generate({ log })}</section>}
-          </aside>
-        </section>
-      </main>
-    </div>
+      <DataWrapper>
+        <DataLogTable log={log} highlightDiscontinuousTimes={visualisation === LineGraphVisualisation} />
+        <aside>
+          {log.isFull &&
+            <Warning title="Log is full">
+              You won"t be able to log any more data until the log is cleared. <a href="https://support.microbit.org/support/solutions/articles/19000127516-what-to-do-when-the-data-log-is-full" target="_blank" rel="noreferrer">Learn more</a>.
+            </Warning>
+          }
+          {log.isEmpty &&
+            <Warning title="Log is empty">
+              You haven"t logged any data yet. Click the link above to learn more about how to log data on the micro:bit.
+            </Warning>
+          }
+          {visualisation && <VisualisationWrapper>{visualisation.generate({ log })}</VisualisationWrapper>}
+        </aside>
+      </DataWrapper>
+    </AppWrapper>
   );
 }

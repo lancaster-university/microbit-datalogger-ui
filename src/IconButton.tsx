@@ -1,5 +1,6 @@
+import { css, keyframes } from "@emotion/react";
+import styled from "@emotion/styled";
 import { useState } from "react";
-import "./IconButton.css";
 
 export interface IconButtonProps {
     icon?: React.ReactNode;
@@ -10,6 +11,26 @@ export interface IconButtonProps {
     onClick?: () => React.ReactNode | void;
 }
 
+const switchIconKeyframes = keyframes`
+    0% {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+`;
+
+type IconSwitchProgress = "enter" | "leave" | null;
+
+const Button = styled.button<{ iconSwitch: IconSwitchProgress }>`
+    svg {
+        animation: ${props => props.iconSwitch && css`${switchIconKeyframes} 0.12s ease-in ${props.iconSwitch === "enter" ? "normal" : "reverse"} forwards`};
+    }
+`;
+
 /**
  * Small button wrapper with support for swapping out icons without having to re-render the parent state.
  * This is used only currently on the 'Copy' button, to provide visual feedback, replacing the clipboard
@@ -19,20 +40,20 @@ export interface IconButtonProps {
  */
 export default function IconButton({ icon, caption, onClick }: IconButtonProps) {
     const [overrideIcon, setOverrideIcon] = useState<React.ReactNode | null>(null);
-    const [className, setClassName] = useState("");
+    const [overrideIconProgress, setOverrideIconProgress] = useState<IconSwitchProgress>(null);
 
     const switchIcon = (icon: React.ReactNode | null) => {
         if (overrideIcon && icon) {
             return;
         }
 
-        setClassName("icon-leaving"); // old icon exit animation
+        setOverrideIconProgress("leave"); // old icon exit animation
         setTimeout(() => {
-            setClassName("icon-entering"); // new icon enter animation
+            setOverrideIconProgress("enter"); // new icon enter animation
             setOverrideIcon(icon);
 
             setTimeout(() => {
-                setClassName(""); // clear all animation classes
+                setOverrideIconProgress(null); // clear all animation classes
             }, 200);
 
             if (icon !== null) {
@@ -53,5 +74,5 @@ export default function IconButton({ icon, caption, onClick }: IconButtonProps) 
         }
     }
 
-    return <button className={className} onClick={handleClick}>{overrideIcon || icon}{caption}</button>
+    return <Button onClick={handleClick} iconSwitch={overrideIconProgress}>{overrideIcon || icon}{caption}</Button>
 }

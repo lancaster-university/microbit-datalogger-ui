@@ -1,14 +1,11 @@
 import { Config, Data, Layout } from "plotly.js";
 import { layoutConfig, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
-import "./LineGraphVisualisation.css";
-import { RiArrowDownSLine, RiFullscreenLine, RiLineChartLine } from "react-icons/ri";
+import { RiLineChartLine } from "react-icons/ri";
 import Warning from "./Warning";
-import React, { Suspense, useEffect, useRef, useState } from "react";
 import { TIME } from "./FieldTypes";
 import { ReactComponent as TooltipImage } from "./resources/line.svg";
 import ExpandingCard from "./ExpandingCard";
-
-const Plot = React.lazy(() => import("react-plotly.js"));
+import PlotWrapper from "./PlotWrapper";
 
 const MAX_GRAPHS = 5; // performance! todo: make the user aware if unable to visualise all the data?
 
@@ -88,16 +85,12 @@ interface LineGraphElementProps {
 
 function LineGraphElement(props: LineGraphElementProps) {
     return (
-        <ExpandingCard title={<><RiLineChartLine/>Rows {props.rowFrom} - {props.rowTo}</>} displayFullscreenButton={true} displayExpandButton={true}>
-            <Suspense fallback={<div className="loading">Loading...</div>}>
-                <Plot
-                    className="graph"
-
-                    data={props.data}
-                    layout={props.layout}
-                    config={props.config}
-                />
-            </Suspense>
+        <ExpandingCard title={<><RiLineChartLine />Rows {props.rowFrom} - {props.rowTo}</>} displayFullscreenButton={true} displayExpandButton={true}>
+            <PlotWrapper
+                data={props.data}
+                layout={props.layout}
+                config={props.config}
+            />
         </ExpandingCard>
     );
 }

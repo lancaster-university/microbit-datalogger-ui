@@ -1,28 +1,30 @@
-import { useRef, useState } from "react";
-import "./Tooltip.css";
+import styled from "@emotion/styled";
+import { useId } from "react";
+import { PlacesType, Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
 
 export interface TooltipProps {
-    content?: React.ReactNode;
+    content?: string;
     children?: React.ReactNode;
-    direction?: "up" | "down";
+    direction?: PlacesType;
 }
 
+const TooltipElement = styled(ReactTooltip)`
+    transition: opacity 0.25s;
+    background: #333;
+    font-weight: normal;
+`;
+
 export default function Tooltip(props: TooltipProps) {
-    const [visible, setVisible] = useState(false);
-    const tooltipRef = useRef<HTMLDivElement>(null);
-
-    const showTooltip = () => {
-        props.content && setVisible(true);
-    };
-
-    const hideTooltip = () => {
-        setVisible(false);
-    };
+    const id = useId();
 
     return (
-        <div className="tooltip-wrapper" onMouseEnter={showTooltip} onMouseDown={hideTooltip} onMouseLeave={hideTooltip}>
-            {props.children}
-            <div ref={tooltipRef} className={`tooltip-tip ${props.direction || "down"} ${visible ? "tooltip-appear" : "tooltip-disappear"}`}>{props.content}</div>
-        </div>
+        <>
+            <span id={id}>
+                {props.children}
+            </span>
+            <TooltipElement anchorId={id} content={props.content} place={props.direction || "bottom"} events={["hover", "click"]}/>
+        </>
+
     )
 }

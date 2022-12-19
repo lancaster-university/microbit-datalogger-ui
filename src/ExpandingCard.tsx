@@ -1,6 +1,7 @@
+import styled from "@emotion/styled";
 import { useEffect, useRef, useState } from "react";
 import { RiArrowDownSLine, RiFullscreenLine } from "react-icons/ri";
-import "./ExpandingCard.css";
+import Card from "./Card";
 import Tooltip from "./Tooltip";
 
 export interface ExpandingCardProps {
@@ -9,6 +10,49 @@ export interface ExpandingCardProps {
     displayExpandButton?: boolean;
     children?: React.ReactNode;
 }
+
+const ExpandingCardContainer = styled(Card)`
+    margin-bottom: 0.8em; //todo probably shouldn't hardcode a margin here
+    display: flex;
+    flex-direction: column;
+`;
+
+const ExpandingCardHeader = styled.div`
+    color: #444;
+    font-size: 1em;
+    display: flex;
+`;
+
+const ExpandingCardTitle = styled.div`
+    display: flex;
+    flex: 1;
+    align-items: center;
+`;
+
+const ExpandingCardOptions = styled.div`
+    display: flex;
+    gap: 0.5em;
+
+    button {
+        border: 0;
+        padding: 0.1em;
+        min-height: unset;
+        border-radius: 8px;
+    }
+
+    svg {
+        margin: 0;
+    }
+`;
+
+const Expander = styled.button<{expanded: boolean}>`
+    svg {
+        transition: all 0.1s ease-in-out;
+        transform-origin: 50% 45%;
+
+        transform: ${props => props.expanded && "rotate(180deg)"};
+    }
+`;
 
 export default function ExpandingCard(props: ExpandingCardProps) {
     const [expanded, setExpanded] = useState(true);
@@ -79,21 +123,21 @@ export default function ExpandingCard(props: ExpandingCardProps) {
     };
 
     return (
-        <div ref={selfRef} className="expanding-card-container card">
-            <div className="card-header">
-                <div className="card-title">{props.title}</div>
-                <div className="card-options">
+        <ExpandingCardContainer ref={selfRef}>
+            <ExpandingCardHeader>
+                <ExpandingCardTitle>{props.title}</ExpandingCardTitle>
+                <ExpandingCardOptions>
                     {document.fullscreenEnabled && props.displayFullscreenButton &&
                         <Tooltip content={"Toggle fullscreen"}>
                             <button onClick={fullscreen}><RiFullscreenLine /></button>
                         </Tooltip>
                     }
-                    {props.displayExpandButton && <button className={`card-expander ${expanded ? "expanded" : ""}`} onClick={expand}><RiArrowDownSLine /></button>}
-                </div>
-            </div>
-            <div className="card-expanded-contents" ref={expandedContentRef} style={{ height: isFullscreen() ? "100%" : undefined }}>
+                    {props.displayExpandButton && <Expander expanded={expanded} onClick={expand}><RiArrowDownSLine /></Expander>}
+                </ExpandingCardOptions>
+            </ExpandingCardHeader>
+            <div ref={expandedContentRef} style={{ height: isFullscreen() ? "100%" : undefined }}>
                 {props.children}
             </div>
-        </div>
+        </ExpandingCardContainer>
     );
 }

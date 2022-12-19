@@ -1,9 +1,8 @@
 import "core-js/es/array";
 import "react-app-polyfill/ie11";
-import ReactDOM from 'react-dom/client';
+import ReactDOM from "react-dom/client";
 import DataLog from "./DataLog";
 import LogDataProvider from "./LogDataProvider";
-
 import "./index.css";
 import ErrorHandler from "./ErrorHandler";
 import { IconContext } from "react-icons";

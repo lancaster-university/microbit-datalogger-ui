@@ -1,7 +1,15 @@
+/* These are styles which apply to both the offline data logger
+(i.e. just extra styling if javascript is not enabled/not compatible)
+as well as global styles for the React view */
+
 body {
-    font-family: Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Now", Helvetica, Arial, sans-serif;
     margin: 0;
     line-height: 1.3;
+}
+
+:root {
+    --primary-accent: #2d1668;
 }
 
 .icon {
@@ -47,7 +55,7 @@ button {
     user-select: none;
 }
 
-button .icon {
+button svg {
     padding-bottom: 2px;
 }
 
@@ -55,4 +63,20 @@ button.primary {
     background: var(--primary-accent);
     border: none;
     color: #fff;
+}
+
+.buttons>*+* {
+    margin-left: 10px;
+}
+
+select {
+    padding: 0.5em 0.4em;
+    border-radius: 0.375rem;
+    border: thin solid #ccc;
+    color: #333;
+}
+
+a:focus,
+button:focus {
+    outline: 3px solid rgba(66, 153, 225, 0.6);
 }

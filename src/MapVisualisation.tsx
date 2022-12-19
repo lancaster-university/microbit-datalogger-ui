@@ -1,17 +1,54 @@
 import { layoutConfig, visualisationConfig, VisualisationProps, VisualisationType } from "./App";
-import { Suspense, useState } from "react";
-import React from "react";
-import "./MapVisualisation.css";
+import { useState } from "react";
 import { Data, Layout, PlotMarker } from "plotly.js";
-import { RiMap2Line, RiSettings2Line } from "react-icons/ri";
+import { RiMap2Line } from "react-icons/ri";
 import Warning from "./Warning";
 import { LATITUDE, LONGITUDE } from "./FieldTypes";
 import { ReactComponent as TooltipImage } from "./resources/map.svg";
 import ExpandingCard from "./ExpandingCard";
-
-const Plot = React.lazy(() => import("react-plotly.js"));
+import styled from "@emotion/styled";
+import Card from "./Card";
+import PlotWrapper from "./PlotWrapper";
 
 type MarkerType = "markers" | "lines+markers" | "lines";
+
+const MapConsentCard = styled(Card)`
+    text-align: center;
+`;
+
+const MapConsentFooter = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.8em;
+`;
+
+const MapConfigWrapper = styled.div`
+    border-bottom: thin solid #ddd;
+    padding: 0.4em;
+
+    display: flex;
+    gap: 0.8em;
+
+    div {
+        display: flex;
+        flex: 1;
+        background: #f4f4f4;
+        padding: 0.4em;
+        border-radius: 8px;
+        gap: 1em;
+        align-items: center;
+
+        label {
+            flex: 2;
+            text-align: right;
+        }
+
+        select {
+            flex: 1;
+            max-width: 15em;
+        }
+    }
+`;
 
 /**
  * Map visualisation. Available for logs with a Latitude and Longitude column. The
@@ -64,19 +101,19 @@ function Map({ log }: VisualisationProps) {
 
     if (!mapConsent) {
         return (
-            <div className="card map-consent">
+            <MapConsentCard>
                 <div>
                     <h3>Using the map view requires accessing data from OpenStreetMap</h3>
                     You can view their privacy policy <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noreferrer">here</a>.
                 </div>
 
-                <div className="modal-buttons">
+                <MapConsentFooter>
                     <button onClick={() => {
                         window.localStorage.setItem("open-street-map-consent", "true");
                         setMapConsent(true);
                     }}>I'm OK with this</button>
-                </div>
-            </div>
+                </MapConsentFooter>
+            </MapConsentCard>
         );
     }
 
@@ -133,31 +170,26 @@ function Map({ log }: VisualisationProps) {
             }
 
             <ExpandingCard title={<><RiMap2Line />Map</>} displayFullscreenButton={true}>
-                <Suspense fallback={<div className="loading">Loading...</div>}>
-                    <Plot className="graph map" data={[data]} layout={layout} config={visualisationConfig} />
+                <PlotWrapper data={[data]} layout={layout} config={visualisationConfig} />
 
-                    <div className="graph-config">
-                        <div><RiSettings2Line /></div>
-                        <div className="config-items-container">
-                            <div className="config-item">
-                                <label htmlFor="map-column-selector">Colour by column</label>
-                                <select id="map-column-selector" placeholder="Set column to visualise" onChange={e => setVisualiseColumn(e.target.value)} disabled={markerType === "lines"} defaultValue={visualiseColumn || undefined}>
-                                    {log.headers.map(h =>
-                                        <option key={h} value={h}>{h}</option>
-                                    )}
-                                </select>
-                            </div>
-                            <div className="config-item">
-                                <label htmlFor="map-marker-selector">Marker type</label>
-                                <select id="map-marker-selector" placeholder="Set column to visualise" onChange={e => setMarkerType(e.target.value as MarkerType)} defaultValue={markerType}>
-                                    <option value={"markers"}>Markers</option>
-                                    <option value={"lines"}>Lines</option>
-                                    <option value={"lines+markers"}>Markers and Lines</option>
-                                </select>
-                            </div>
-                        </div>
+                <MapConfigWrapper>
+                    <div>
+                        <label htmlFor="map-column-selector">Colour by column</label>
+                        <select id="map-column-selector" placeholder="Set column to visualise" onChange={e => setVisualiseColumn(e.target.value)} disabled={markerType === "lines"} defaultValue={visualiseColumn || undefined}>
+                            {log.headers.map(h =>
+                                <option key={h} value={h}>{h}</option>
+                            )}
+                        </select>
                     </div>
-                </Suspense>
+                    <div>
+                        <label htmlFor="map-marker-selector">Marker type</label>
+                        <select id="map-marker-selector" placeholder="Set column to visualise" onChange={e => setMarkerType(e.target.value as MarkerType)} defaultValue={markerType}>
+                            <option value={"markers"}>Markers</option>
+                            <option value={"lines"}>Lines</option>
+                            <option value={"lines+markers"}>Markers and Lines</option>
+                        </select>
+                    </div>
+                </MapConfigWrapper>
             </ExpandingCard>
         </>
     );

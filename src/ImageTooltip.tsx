@@ -1,10 +1,15 @@
-import "./ImageTooltip.css";
+import styled from "@emotion/styled";
 
 export interface ImageTooltipProps {
     title?: string;
     image?: React.ReactNode;
     description?: string;
 }
+
+const ImageTooltipImage = styled.div`
+    text-align: center;
+    padding: 0.5em 0;
+`;
 
 export default function ImageTooltip(props: ImageTooltipProps) {
     return (
@@ -15,9 +20,9 @@ export default function ImageTooltip(props: ImageTooltipProps) {
                 </div>
             }
             {props.image &&
-                <div className="image-tooltip-image">
+                <ImageTooltipImage>
                     {props.image}
-                </div>
+                </ImageTooltipImage>
             }
             {props.description &&
                 <div>

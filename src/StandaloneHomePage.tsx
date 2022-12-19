@@ -1,3 +1,4 @@
+import styled from "@emotion/styled";
 import React, { useEffect, useRef, useState } from "react";
 import { RiClipboardLine, RiFolderOpenLine } from "react-icons/ri";
 import { LogData } from ".";
@@ -5,14 +6,51 @@ import DataLog from "./DataLog";
 import DataLogSource, { StandaloneDataLogSource } from "./DataLogSource";
 import IconButton from "./IconButton";
 import { gpsData, petTallyData } from "./sample-data";
-import "./StandaloneHomePage.css";
 
 export interface StandaloneHomePageProps {
     logLoaded(log: LogData): void;
 }
 
+const Root = styled.div<{ highlightDrop: boolean }>`
+    
+`;
+
+const FilePickerWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    margin-top: 1.8em;
+    margin-bottom: 1.8em;
+    gap: 1em;
+
+    button {
+        font-size: 1em;
+        min-height: 40px;
+    }
+
+    input {
+        display: none;
+    }
+`;
+
+const DataSamplesWrapper = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+
+    > div {
+        flex: 1;
+        overflow: hidden;
+    }
+`;
+
+const DataSampleTitle = styled.div`
+    font-weight: 600;
+    padding-bottom: 0.25em;
+`;
+
 export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProps) {
     const [recents, setRecents] = useState<StandaloneDataLogSource[]>([]);
+    const [draggedOver, setDraggedOver] = useState(false);
 
     const filePicker = useRef<HTMLInputElement | null>(null);
     const dropAreaRef = useRef<HTMLDivElement>(null);
@@ -62,11 +100,11 @@ export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProp
 
     const handleDrag = (event: React.DragEvent) => {
         event.preventDefault();
-        dropAreaRef.current?.classList.add("highlight");
+        setDraggedOver(true);
     };
 
     const handleDragLeave = () => {
-        dropAreaRef.current?.classList.remove("highlight");
+        setDraggedOver(false);
     };
 
     const handleDrop = async (event: React.DragEvent) => {
@@ -88,31 +126,32 @@ export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProp
     };
 
     return (
-        <div ref={dropAreaRef}
+        <Root ref={dropAreaRef}
             onDrop={handleDrop}
             onDragOver={handleDrag}
             onDragLeave={handleDragLeave}
-            className="standalone-root">
+            highlightDrop={draggedOver}
+        >
             You're using the datalogger in standalone mode. This allows you to load data directly from a CSV file.
-            <div id="file-picker-wrapper">
+            <FilePickerWrapper>
                 <IconButton icon={<RiFolderOpenLine />} caption="Choose file" onClick={() => filePicker.current?.click()} />
                 <IconButton icon={<RiClipboardLine />} caption="Load from clipboard" onClick={loadFromClipboard} />
                 <input type="file" ref={filePicker} onChange={loadFile} accept=".csv" />
-            </div>
-            <div id="data-samples-wrapper">
-                <div className="data-samples">
-                    <div className="sample-title">Sample Data</div>
+            </FilePickerWrapper>
+            <DataSamplesWrapper>
+                <div>
+                    <DataSampleTitle>Sample Data</DataSampleTitle>
                     {samples.map((sample, ix) =>
                         <DataLogSource key={ix} source={sample} onClick={loadStandalone} />
                     )}
                 </div>
-                <div className="data-samples">
-                    <div className="sample-title">Recent Files</div>
+                <div>
+                    <DataSampleTitle>Recent Files</DataSampleTitle>
                     {recents.map((sample, ix) =>
                         <DataLogSource key={ix} source={sample} onClick={loadStandalone} />
                     )}
                 </div>
-            </div>
-        </div>
+            </DataSamplesWrapper>
+        </Root>
     );
 }
