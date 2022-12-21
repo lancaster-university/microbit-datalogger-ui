@@ -8,7 +8,7 @@ import Modal, { ModalContents, ModalProps } from "./Modal";
 import DataLog from "./DataLog";
 import { RiCheckLine, RiClipboardLine, RiDeleteBin2Line, RiDownload2Line, RiQuestionLine, RiRefreshLine, RiShareLine } from "react-icons/ri";
 import Warning from "./Warning";
-import { LogData, parseRawData } from ".";
+import { LogData } from ".";
 import DataUpdateNotification from "./DataUpdateNotification";
 import IconButton from "./IconButton";
 import TallyVisualisation from "./TallyVisualisation";
@@ -103,7 +103,6 @@ const shareTargets: ShareTarget[] = [ // add new share targets here
 const AppWrapper = styled.div`
   margin: 0;
   display: grid;
-  background-image: linear-gradient(to bottom, #eee, #eee);
 `;
 
 const Header = styled.header`
@@ -196,7 +195,7 @@ export default function App(props: LogData) {
   useEffect(() => {
     const updateListener = (e: Event) => {
       if (e instanceof CustomEvent) {
-        const data = parseRawData(e.detail);
+        const data = DataLog.parse(e.detail);
 
         // if we choose to update our data to the latest from disk, since the offline js
         // isn"t aware of this it"ll continuously inform us of updates to the original
@@ -241,11 +240,11 @@ export default function App(props: LogData) {
       return <RiCheckLine />;
     }
 
-    showModal({ title: "No changes detected", content: <div>To see the latest data that changed after you opened this file, you must unplug your micro:bit and plug it back in.</div> });
+    showModal({ title: "No changes detected", children: <div>To see the latest data that changed after you opened this file, you must unplug your micro:bit and plug it back in.</div> });
   };
 
   const clearLog = () => {
-    showModal({ title: "Clearing the data log", content: <div>The log is cleared when you reflash your micro:bit. Your program can include code or blocks to clear the log when you choose. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank" rel="noreferrer">Learn more about data logging</a>.</div> });
+    showModal({ title: "Clearing the data log", children: <div>The log is cleared when you reflash your micro:bit. Your program can include code or blocks to clear the log when you choose. <a href="https://microbit.org/get-started/user-guide/data-logging/" target="_blank" rel="noreferrer">Learn more about data logging</a>.</div> });
   };
 
   const visualise = (visIndex: number) => {
@@ -343,7 +342,7 @@ export default function App(props: LogData) {
           {
             /* Share targets */
             shareTargets.length > 0 &&
-            <DropDownButton primary={true} entries={shareTargets.map(target => ({ element: <>{target.icon}{target.name}</>, tooltip: target.tooltip }))} onClick={handleShare} onDropdownSelected={handleShare} />
+            <DropDownButton primary={true} entries={shareTargets.map(target => ({ element: <>{target.icon}{target.name}</>, tooltip: target.tooltip }))} onSelect={handleShare} />
           }
 
           <Tooltip content="Copies the contents of the log to your clipboard">
@@ -391,12 +390,12 @@ export default function App(props: LogData) {
         <aside>
           {log.isFull &&
             <Warning title="Log is full">
-              You won"t be able to log any more data until the log is cleared. <a href="https://support.microbit.org/support/solutions/articles/19000127516-what-to-do-when-the-data-log-is-full" target="_blank" rel="noreferrer">Learn more</a>.
+              You won't be able to log any more data until the log is cleared. <a href="https://support.microbit.org/support/solutions/articles/19000127516-what-to-do-when-the-data-log-is-full" target="_blank" rel="noreferrer">Learn more</a>.
             </Warning>
           }
           {log.isEmpty &&
             <Warning title="Log is empty">
-              You haven"t logged any data yet. Click the link above to learn more about how to log data on the micro:bit.
+              You haven't logged any data yet. Click the help button above to learn more about how to log data on the micro:bit.
             </Warning>
           }
           {visualisation && <VisualisationWrapper>{visualisation.generate({ log })}</VisualisationWrapper>}

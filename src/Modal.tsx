@@ -7,7 +7,7 @@ export interface ModalProps extends ModalContents {
 }
 
 export interface ModalContents {
-    content: React.ReactNode;
+    children: React.ReactNode;
     title: string;
     hideCloseButton?: boolean;
 }
@@ -85,7 +85,7 @@ export default function Modal(props: ModalProps) {
         return () => dialog?.close();
     });
 
-    if (!props.content) {
+    if (!props.children) {
         return null;
     }
 
@@ -95,7 +95,7 @@ export default function Modal(props: ModalProps) {
                 {props.title}
             </ModalTitle>
             <div>
-                {props.content}
+                {props.children}
             </div>
             <ModalFooter>
                 {!props.hideCloseButton && <button ref={closeButtonRef} onClick={close}>Close</button>}

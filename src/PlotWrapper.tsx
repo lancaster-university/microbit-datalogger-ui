@@ -7,9 +7,10 @@ import { PlotParams } from "react-plotly.js";
 const Plot = React.lazy(() => import("react-plotly.js"));
 
 const StyledPlot = styled(Plot)`
-width: 100%;
-height: 100%;
-overflow: hidden;
+    width: 100%;
+    //height: 100%;
+    overflow: hidden;
+    height: inherit;
 `;
 
 const LoadFailure = styled.div`
@@ -63,5 +64,3 @@ export default class PlotWrapper extends React.Component<PlotParams, { failedToL
         );
     }
 }
-
-/*export default */

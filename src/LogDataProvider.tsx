@@ -23,11 +23,11 @@ export default function LogDataProvider({ log }: { log: LogData | null }) {
     return (
         <>
             {!logData &&
-                <Modal title="Standalone Mode" content={
+                <Modal title="micro:bit data log" onClose={() => { }} hideCloseButton={true}>
                     <Suspense>
                         <StandaloneHomePage logLoaded={setLogData} />
                     </Suspense>
-                } onClose={() => { }} hideCloseButton={true} />
+                </Modal>
             }
             {logData && <App {...logData} />}
         </>

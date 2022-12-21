@@ -22,12 +22,15 @@ const MapConsentFooter = styled.div`
     margin-top: 0.8em;
 `;
 
-const MapConfigWrapper = styled.div`
-    border-bottom: thin solid #ddd;
-    padding: 0.4em;
+const MapWrapper = styled(PlotWrapper)`
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 0.4em 0;
+`;
 
+const MapConfigWrapper = styled.div`
     display: flex;
-    gap: 0.8em;
+    gap: 0.7em;
 
     div {
         display: flex;
@@ -170,7 +173,7 @@ function Map({ log }: VisualisationProps) {
             }
 
             <ExpandingCard title={<><RiMap2Line />Map</>} displayFullscreenButton={true}>
-                <PlotWrapper data={[data]} layout={layout} config={visualisationConfig} />
+                <MapWrapper data={[data]} layout={layout} config={visualisationConfig} />
 
                 <MapConfigWrapper>
                     <div>

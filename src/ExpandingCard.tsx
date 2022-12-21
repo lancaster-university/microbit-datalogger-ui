@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { RiArrowDownSLine, RiFullscreenLine } from "react-icons/ri";
 import Card from "./Card";
 import Tooltip from "./Tooltip";
@@ -55,11 +55,26 @@ const Expander = styled.button<{expanded: boolean}>`
 `;
 
 export default function ExpandingCard(props: ExpandingCardProps) {
+    const isFullscreen = () => !!document.fullscreenElement;
+
     const [expanded, setExpanded] = useState(true);
+    const [renderFullscreen, setRenderFullscreen] = useState(isFullscreen);
 
     const firstRender = useRef(true);
     const selfRef = useRef<HTMLDivElement>(null);
     const expandedContentRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const callback = () => {
+            setRenderFullscreen(isFullscreen());
+        }
+
+        document.addEventListener("fullscreenchange", callback);
+
+        return () => {
+            document.removeEventListener("fullscreenchange", callback);
+        }
+    });
 
     useEffect(() => {
         if (firstRender.current || isFullscreen()) {
@@ -89,7 +104,7 @@ export default function ExpandingCard(props: ExpandingCardProps) {
                     contentElement.style.height = `${targetHeight}px`;
 
                     setTimeout(() => {
-                        contentElement.style.height = "auto";
+                        contentElement.style.height = "";
                     }, 300);
                 });
             });
@@ -105,10 +120,8 @@ export default function ExpandingCard(props: ExpandingCardProps) {
         }
     }, [expanded]);
 
-    const isFullscreen = () => !!document.fullscreenElement;
-
     const expand = () => {
-        if (!(isFullscreen())) {
+        if (!isFullscreen()) {
             setExpanded(!expanded);
         }
     };
@@ -132,10 +145,10 @@ export default function ExpandingCard(props: ExpandingCardProps) {
                             <button onClick={fullscreen}><RiFullscreenLine /></button>
                         </Tooltip>
                     }
-                    {props.displayExpandButton && <Expander expanded={expanded} onClick={expand}><RiArrowDownSLine /></Expander>}
+                    {props.displayExpandButton && !renderFullscreen && <Expander expanded={expanded} onClick={expand}><RiArrowDownSLine /></Expander>}
                 </ExpandingCardOptions>
             </ExpandingCardHeader>
-            <div ref={expandedContentRef} style={{ height: isFullscreen() ? "100%" : undefined }}>
+            <div ref={expandedContentRef} style={{ height: renderFullscreen ? "100%" : undefined }}>
                 {props.children}
             </div>
         </ExpandingCardContainer>

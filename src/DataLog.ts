@@ -32,6 +32,50 @@ export default class DataLog {
     }
 
     /**
+     * Parses the specified input into a data log. This is a wrapper over 'parseCSV', as it also
+     * allows for parsing of MY_FILES.HTM files (for example, from the previous data logger - allowing
+     * easier porting across to this version)
+     * 
+     * @param data the string to parse
+     * @returns the data log from the parsed data, null if failed to parse
+     */
+    public static parse(data: string): LogData | null {
+        const logFsHeader = /^UBIT_LOG_FS_V_002/;
+
+        const raw = logFsHeader.test(data) ? data : data.split("FS_START")[2];
+
+        if (raw && logFsHeader.test(raw)) {
+            const daplinkVersion = parseInt(raw.substring(40, 44));
+
+            const dataStart = parseInt(raw.substring(29, 39)) - 2048; // hex encoded
+            const logEnd = parseInt(raw.substring(18, 28)) - 2048; // hex encoded
+
+            let dataSize = 0;
+            while (raw.charCodeAt(dataStart + dataSize) !== 0xfffd) {
+                dataSize++;
+
+                if (dataStart + dataSize > raw.length) {
+                    return null;
+                }
+            }
+
+            const bytesRemaining = logEnd - dataStart - dataSize;
+
+            let hash = 0;
+            for (let i = 0; i < raw.length; i++) {
+                hash = 31 * hash + raw.charCodeAt(i);
+                hash |= 0;
+            }
+
+            const full = raw.substring(logEnd + 1, logEnd + 4) === "FUL";
+
+            return { log: this.fromCSV(raw.substring(dataStart, dataStart + dataSize), full), bytesRemaining, daplinkVersion, dataSize, hash, standalone: false };
+        }
+
+        return this.fromCSV(data).asStandaloneLog();
+    }
+
+    /**
      * Constructs a data log from supplied CSV data
      * 
      * @param csv the CSV data string
@@ -73,7 +117,7 @@ export default class DataLog {
             parsedRow.push(...row.slice(currentIndex).split(","));
 
             const dataLogRow: DataLogRow = {
-                data: parsedRow.filter(row => row.length !== 0),
+                data: parsedRow,//.filter(row => row.length !== 0),
                 isHeading: index === 0 || values[index - 1].length === 0,
             };
 

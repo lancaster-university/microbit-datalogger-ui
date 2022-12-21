@@ -27,34 +27,6 @@ export interface LogData {
   standalone: boolean;
 }
 
-export function parseRawData(raw: string): LogData | null {
-  if (!/^UBIT_LOG_FS_V_002/.test(raw)) {
-    return null;
-  }
-
-  const daplinkVersion = parseInt(raw.substring(40, 44));
-  const dataStart = parseInt(raw.substring(29, 39)) - 2048; // hex encoded
-  const logEnd = parseInt(raw.substring(18, 28)) - 2048; // hex encoded
-
-  let dataSize = 0;
-  while (raw.charCodeAt(dataStart + dataSize) !== 0xfffd) {
-    dataSize++;
-  }
-
-  const bytesRemaining = logEnd - dataStart - dataSize;
-
-  let hash = 0;
-  for (let i = 0; i < raw.length; i++) {
-    hash = 31 * hash + raw.charCodeAt(i);
-    hash |= 0;
-  }
-
-  const full = raw.substring(logEnd + 1, logEnd + 4) === "FUL";
-  const log = DataLog.fromCSV(raw.substring(dataStart, dataStart + dataSize), full);
-
-  return { log, hash, dataSize, bytesRemaining, daplinkVersion, standalone: false };
-}
-
 /**
  * This is where the app begins! We're either:
  * 
@@ -101,7 +73,7 @@ export function parseRawData(raw: string): LogData | null {
       // why we still call the base load method and don't just do it ourselves
       baseLoad();
 
-      const logData = parseRawData(offlineDataLog.raw);
+      const logData = DataLog.parse(offlineDataLog.raw);
 
       if (!logData) { // failed to parse log data
         // TODO: error handle

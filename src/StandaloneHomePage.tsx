@@ -5,6 +5,7 @@ import { LogData } from ".";
 import DataLog from "./DataLog";
 import DataLogSource, { StandaloneDataLogSource } from "./DataLogSource";
 import IconButton from "./IconButton";
+import Modal from "./Modal";
 import { gpsData, petTallyData } from "./sample-data";
 
 export interface StandaloneHomePageProps {
@@ -12,14 +13,14 @@ export interface StandaloneHomePageProps {
 }
 
 const Root = styled.div<{ highlightDrop: boolean }>`
-    
+    display: flex;
+    flex-direction: column;
+    gap: 1.8em;
 `;
 
 const FilePickerWrapper = styled.div`
     display: flex;
     justify-content: center;
-    margin-top: 1.8em;
-    margin-bottom: 1.8em;
     gap: 1em;
 
     button {
@@ -48,9 +49,14 @@ const DataSampleTitle = styled.div`
     padding-bottom: 0.25em;
 `;
 
+const LoadError = styled.div`
+    padding-bottom: 0.5em;
+`;
+
 export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProps) {
     const [recents, setRecents] = useState<StandaloneDataLogSource[]>([]);
     const [draggedOver, setDraggedOver] = useState(false);
+    const [loadErrorVisible, setLoadErrorVisible] = useState(false);
 
     const filePicker = useRef<HTMLInputElement | null>(null);
     const dropAreaRef = useRef<HTMLDivElement>(null);
@@ -78,7 +84,15 @@ export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProp
         newRecents.length = Math.min(newRecents.length, 5); // cap at 5
 
         window.localStorage.setItem("recent-files", JSON.stringify(newRecents));
-        logLoaded(DataLog.fromCSV(data.log).asStandaloneLog());
+
+        const parsedData = DataLog.parse(data.log);
+
+        if (!parsedData) {
+            setLoadErrorVisible(true);
+            return;
+        }
+
+        logLoaded(parsedData);
     };
 
     const samples: StandaloneDataLogSource[] = [
@@ -132,12 +146,18 @@ export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProp
             onDragLeave={handleDragLeave}
             highlightDrop={draggedOver}
         >
-            You're using the datalogger in standalone mode. This allows you to load data directly from a CSV file.
+            You're using the datalogger in standalone mode. This allows you to load data directly from a CSV or micro:bit data file.
             <FilePickerWrapper>
                 <IconButton icon={<RiFolderOpenLine />} caption="Choose file" onClick={() => filePicker.current?.click()} />
                 <IconButton icon={<RiClipboardLine />} caption="Load from clipboard" onClick={loadFromClipboard} />
                 <input type="file" ref={filePicker} onChange={loadFile} accept=".csv" />
             </FilePickerWrapper>
+            {
+                loadErrorVisible &&
+                <Modal title="Failed to load" onClose={() => setLoadErrorVisible(false)}>
+                    <LoadError>Failed to load file. Make sure it is a valid .csv or MY_DATA.HTM file.</LoadError>
+                </Modal>
+            }
             <DataSamplesWrapper>
                 <div>
                     <DataSampleTitle>Sample Data</DataSampleTitle>

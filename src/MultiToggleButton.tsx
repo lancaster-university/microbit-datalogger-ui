@@ -37,7 +37,7 @@ const ButtonWrapper = styled.div`
 
 const Button = styled.button<{ active: boolean }>`
     background: ${props => props.active && "rgb(221, 221, 250)"};
-    box-shadow: ${props => props.active && "inset 0 2px 8px 2px rgba(0, 0, 0, 0.15)"};
+    box-shadow: ${props => props.active && "inset 0 2px 8px 2px rgba(0, 0, 0, 0.1)"};
 `;
 
 export default function MultiToggleButton(props: MultiToggleButtonProps) {

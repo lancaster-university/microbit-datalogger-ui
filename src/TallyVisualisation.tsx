@@ -44,6 +44,10 @@ const MapVisualisation: VisualisationType = {
     tooltipImage: <TooltipImage />,
     icon: <RiBarChartLine />,
     availablityError: log => {
+        if (log.isEmpty) {
+            return "Log cannot be empty.";
+        }
+
         return null;
     },
     generate: (props) => <Tally {...props} />

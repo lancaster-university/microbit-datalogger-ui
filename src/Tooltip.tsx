@@ -13,6 +13,7 @@ const TooltipElement = styled(ReactTooltip)`
     transition: opacity 0.25s;
     background: #333;
     font-weight: normal;
+    z-index: 2; // in front of plots
 `;
 
 export default function Tooltip(props: TooltipProps) {
@@ -23,7 +24,7 @@ export default function Tooltip(props: TooltipProps) {
             <span id={id}>
                 {props.children}
             </span>
-            <TooltipElement anchorId={id} content={props.content} place={props.direction || "bottom"} events={["hover", "click"]}/>
+            <TooltipElement anchorId={id} content={props.content} place={props.direction || "bottom"} positionStrategy={"fixed"} events={["hover", "click"]}/>
         </>
 
     )

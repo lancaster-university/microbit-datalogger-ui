@@ -1,7 +1,7 @@
+import styled from "@emotion/styled";
 import React, { useState } from "react";
 import { RiMore2Fill } from "react-icons/ri";
 import DropDownMenu, { DropDownEntry } from "./DropDownMenu";
-import "./Button.css";
 import Tooltip from "./Tooltip";
 
 export interface DropDownButtonProps {
@@ -11,14 +11,11 @@ export interface DropDownButtonProps {
      */
     entries?: DropDownEntry[];
     /**
-     * Event handler for clicking on the main action for this button
+     * Event handler for selecting any of the actions for this button.
+     * Provides the index of the selected item. 0 indicates the main
+     * button was pressed, >= 1 indicates an item from the dropdown menu.
      */
-    onClick?: () => any;
-    /**
-     * Event handler for clicking on any of the secondary actions for this
-     * button. Contains the index of the selected item
-     */
-    onDropdownSelected?: (index: number) => any;
+    onSelect?: (index: number) => any;
     /**
      * Whether this is a primary button. Will apply the 'primary' css style
      * to both button sections if so
@@ -26,6 +23,29 @@ export interface DropDownButtonProps {
     primary?: boolean;
     style?: React.CSSProperties;
 }
+
+const ButtonWrapper = styled.div`
+    display: flex;
+    position: relative;
+`;
+
+const MainButton = styled.button<{hasDropdown: boolean}>`
+    border-top-right-radius: ${props => props.hasDropdown && 0};
+    border-bottom-right-radius: ${props => props.hasDropdown && 0};
+`;
+
+const MenuButton = styled.button<{primary: boolean}>`
+    border-left: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 0 0.8em 0 0.6em;
+
+    margin-left: ${props => props.primary && "1px"};
+
+    svg {
+        margin: 0;
+    }
+`;
 
 /**
  * A combination of a button and drop-down menu. A drop-down button has
@@ -43,14 +63,9 @@ export default function DropDownButton(props: DropDownButtonProps) {
         }
     };
 
-    const handleDropdownSelect = (index: number) => {
+    const handleClick = (index: number) => {
         setDropdownOpen(false);
-        props.onDropdownSelected && props.onDropdownSelected(index);
-    };
-
-    const handleMainButtonClick = () => {
-        setDropdownOpen(false);
-        props.onClick && props.onClick();
+        props.onSelect && props.onSelect(index + 1);
     };
 
     if (!props.entries) {
@@ -63,24 +78,29 @@ export default function DropDownButton(props: DropDownButtonProps) {
     const validDropdown = props.entries.length > 1;
 
     return (
-        <div className="button-wrapper" onBlur={handleBlur} style={props.style}>
+        <ButtonWrapper onBlur={handleBlur} style={props.style}>
             {firstEntry &&
                 <Tooltip content={firstEntry.tooltip}>
-                    <button className={"button-main " + (validDropdown ? "dropdown " : " ") + (props.primary ? "primary" : "")} onClick={handleMainButtonClick}>
+                    <MainButton hasDropdown={validDropdown} className={props.primary ? "primary" : ""} onClick={() => handleClick(-1)}>
                         {firstEntry.element}
-                    </button>
+                    </MainButton>
                 </Tooltip>
+
+                // todo: currently a weird mix of styled components and vanilla css classes is used here - this is because a primary
+                // button style is defined within index.css - which contain styles which also work with the offline data logger such as if
+                // the user has javascript disabled or this app fails to load on top for whatever reason. the button styles could be reimplemented
+                // as styled component styles but that's probably wasteful... so the "primary" class for buttons is just used for now
             }
 
             {validDropdown &&
-                <button className={"button-dropdown " + (dropdownOpen ? "open " : " ") + (props.primary ? "primary" : "")} onClick={() => setDropdownOpen(!dropdownOpen)}>
+                <MenuButton primary={!!props.primary} className={props.primary ? "primary" : ""} onClick={() => setDropdownOpen(!dropdownOpen)}>
                     <RiMore2Fill />
-                </button>
+                </MenuButton>
             }
 
             {validDropdown && dropdownOpen &&
-                <DropDownMenu items={props.entries.slice(1)} onSelected={handleDropdownSelect} />
+                <DropDownMenu items={props.entries.slice(1)} onSelected={handleClick} />
             }
-        </div>
+        </ButtonWrapper>
     );
 }
