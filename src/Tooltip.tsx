@@ -14,6 +14,7 @@ const TooltipElement = styled(ReactTooltip)`
     background: #333;
     font-weight: normal;
     z-index: 2; // in front of plots
+    font-size: 1rem;
 `;
 
 export default function Tooltip(props: TooltipProps) {

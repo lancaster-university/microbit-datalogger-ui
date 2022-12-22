@@ -18,6 +18,7 @@ import { ReactComponent as MicrobitLogo } from "./resources/microbit-logo.svg";
 import BrowserWarning from "./BrowserWarning";
 import styled from "@emotion/styled";
 import { keyframes } from "@emotion/react";
+import CardStack from "./CardStack";
 
 /**
  * Visualisations are the context-specific ways of presenting data in the data log.
@@ -140,7 +141,7 @@ const ButtonsWrapper = styled.div`
 
 const DataWrapper = styled.main`
   display: flex;
-  flex-flow: row wrap-reverse !important;
+  flex-flow: row wrap-reverse;
   gap: 0.8em;
   margin: 1em;
 
@@ -148,11 +149,11 @@ const DataWrapper = styled.main`
     align-self: flex-end;
   }
 
-  > aside {
+  > :last-child {
     flex: 1;
   }
 
-  > aside:empty {
+  > :empty {
     display: none; /* fixes empty gap on small screens */
   }
 `;
@@ -172,6 +173,15 @@ const visualisationAppearKeyframes = keyframes`
 const VisualisationWrapper = styled.div`
   min-width: 400px;
   animation: ${visualisationAppearKeyframes} 0.3s;
+`;
+
+const LogSpaceIndicator = styled.span`
+  background: rgba(0, 0, 0, 0.12);
+  color: rgba(250, 250, 250, 0.9);
+  padding: 0.1em 0.6em;
+  font-size: 0.7em;
+  border-radius: 30px;
+  margin-left: 0.5em;
 `;
 
 /**
@@ -319,6 +329,8 @@ export default function App(props: LogData) {
   const help = () => {
     window.open("https://microbit.org/get-started/user-guide/data-logging/", "_blank");
   };
+  
+  const logFullness = props.standalone || props.log.isFull ? "100.0" : (props.dataSize / (props.dataSize + props.bytesRemaining)).toFixed(1);
 
   return (
     <AppWrapper>
@@ -332,7 +344,14 @@ export default function App(props: LogData) {
           <MicrobitLogo />
         </MicrobitLogoWrapper>
 
-        <h1>micro:bit data log</h1>
+        <h1>micro:bit data log
+          {
+            !props.standalone &&
+            <Tooltip direction="right" content={`Data log storage is ${logFullness}% full. Using ${props.dataSize} bytes out of ${(props.dataSize + props.bytesRemaining)}`}>
+              <LogSpaceIndicator>{logFullness}% full</LogSpaceIndicator>
+            </Tooltip>
+          }
+        </h1>
         <h3>
           This is the data on your micro:bit. To analyse it and create your own graphs, transfer it to your computer.
           You can copy and paste your data, or download it as a CSV file which you can import into a spreadsheet or graphing tool.
@@ -387,7 +406,7 @@ export default function App(props: LogData) {
 
       <DataWrapper>
         <DataLogTable log={log} highlightDiscontinuousTimes={visualisation === LineGraphVisualisation} />
-        <aside>
+        <CardStack>
           {log.isFull &&
             <Warning title="Log is full">
               You won't be able to log any more data until the log is cleared. <a href="https://support.microbit.org/support/solutions/articles/19000127516-what-to-do-when-the-data-log-is-full" target="_blank" rel="noreferrer">Learn more</a>.
@@ -399,7 +418,7 @@ export default function App(props: LogData) {
             </Warning>
           }
           {visualisation && <VisualisationWrapper>{visualisation.generate({ log })}</VisualisationWrapper>}
-        </aside>
+        </CardStack>
       </DataWrapper>
     </AppWrapper>
   );

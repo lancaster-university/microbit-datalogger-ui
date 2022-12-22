@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RiArrowDownSLine, RiFullscreenLine } from "react-icons/ri";
 import Card from "./Card";
 import Tooltip from "./Tooltip";
@@ -9,24 +9,31 @@ export interface ExpandingCardProps {
     displayFullscreenButton?: boolean;
     displayExpandButton?: boolean;
     children?: React.ReactNode;
+    maxHeight?: number;
 }
 
 const ExpandingCardContainer = styled(Card)`
-    margin-bottom: 0.8em; //todo probably shouldn't hardcode a margin here
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 `;
 
 const ExpandingCardHeader = styled.div`
     color: #444;
     font-size: 1em;
     display: flex;
+    z-index: 2;
 `;
 
 const ExpandingCardTitle = styled.div`
     display: flex;
     flex: 1;
     align-items: center;
+`;
+
+const ExpandingCardContent = styled.div<{ fullscreen: boolean, height?: number }>`
+    overflow: hidden;
+    height: ${props => props.fullscreen ? "100%" : props.height && `${props.height}px`};
 `;
 
 const ExpandingCardOptions = styled.div`
@@ -45,7 +52,7 @@ const ExpandingCardOptions = styled.div`
     }
 `;
 
-const Expander = styled.button<{expanded: boolean}>`
+const Expander = styled.button<{ expanded: boolean }>`
     svg {
         transition: all 0.1s ease-in-out;
         transform-origin: 50% 45%;
@@ -63,6 +70,7 @@ export default function ExpandingCard(props: ExpandingCardProps) {
     const firstRender = useRef(true);
     const selfRef = useRef<HTMLDivElement>(null);
     const expandedContentRef = useRef<HTMLDivElement>(null);
+    const canExpand = useRef(true);
 
     useEffect(() => {
         const callback = () => {
@@ -88,12 +96,11 @@ export default function ExpandingCard(props: ExpandingCardProps) {
             return;
         }
 
+        canExpand.current = false;
+
         if (expanded) {
             // Animate expansion
             contentElement.style.height = "auto";
-            contentElement.style.overflow = "hidden";
-            debugger;
-            //contentElement.style.height = "0";
             contentElement.style.transition = "height 0.3s ease-in";
 
             requestAnimationFrame(() => {
@@ -104,7 +111,8 @@ export default function ExpandingCard(props: ExpandingCardProps) {
                     contentElement.style.height = `${targetHeight}px`;
 
                     setTimeout(() => {
-                        contentElement.style.height = "";
+                        contentElement.style.height = renderFullscreen ? "100%" : `${props.maxHeight}px`;
+                        canExpand.current = true;
                     }, 300);
                 });
             });
@@ -116,12 +124,15 @@ export default function ExpandingCard(props: ExpandingCardProps) {
 
             requestAnimationFrame(() => {
                 contentElement.style.height = "0";
+                canExpand.current = true;
             });
         }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [expanded]);
 
     const expand = () => {
-        if (!isFullscreen()) {
+        if (canExpand.current && !isFullscreen()) {
             setExpanded(!expanded);
         }
     };
@@ -130,8 +141,8 @@ export default function ExpandingCard(props: ExpandingCardProps) {
         if (isFullscreen()) {
             document.exitFullscreen();
         } else {
-            selfRef.current?.requestFullscreen();
             setExpanded(true);
+            selfRef.current?.requestFullscreen();
         }
     };
 
@@ -148,9 +159,9 @@ export default function ExpandingCard(props: ExpandingCardProps) {
                     {props.displayExpandButton && !renderFullscreen && <Expander expanded={expanded} onClick={expand}><RiArrowDownSLine /></Expander>}
                 </ExpandingCardOptions>
             </ExpandingCardHeader>
-            <div ref={expandedContentRef} style={{ height: renderFullscreen ? "100%" : undefined }}>
+            <ExpandingCardContent ref={expandedContentRef} height={props.maxHeight} fullscreen={renderFullscreen}>
                 {props.children}
-            </div>
+            </ExpandingCardContent>
         </ExpandingCardContainer>
     );
 }

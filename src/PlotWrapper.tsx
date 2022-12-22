@@ -6,11 +6,17 @@ import { PlotParams } from "react-plotly.js";
 
 const Plot = React.lazy(() => import("react-plotly.js"));
 
-const StyledPlot = styled(Plot)`
+const StyledPlot = styled(Plot)<{height?: number}>`
     width: 100%;
     //height: 100%;
     overflow: hidden;
-    height: inherit;
+    height: ${props => props.height && `${props.height}px`};
+    max-height: ${props => props.height && `${props.height}px`};
+
+    @media all and (display-mode: fullscreen) {
+        height: 100%;
+        max-height: 100%;
+    }
 `;
 
 const LoadFailure = styled.div`
@@ -20,8 +26,8 @@ const LoadFailure = styled.div`
 `;
 
 const loadingKeyframes = keyframes`
-    0% {
-        opacity: 0.8;
+    0%, 100% {
+        opacity: 0.4;
     }
 
     50% {
@@ -32,7 +38,7 @@ const loadingKeyframes = keyframes`
 const Loading = styled.div`
     text-align: center;
     color: #444;
-    animation: ${loadingKeyframes} 5s infinite;
+    animation: ${loadingKeyframes} 3s infinite;
 `;
 
 export default class PlotWrapper extends React.Component<PlotParams, { failedToLoad: boolean }> {
@@ -56,7 +62,7 @@ export default class PlotWrapper extends React.Component<PlotParams, { failedToL
 
                 {!this.state.failedToLoad &&
                     <Suspense fallback={<Loading>Loading...</Loading>}>
-                        <StyledPlot {...this.props} />
+                        <StyledPlot height={this.props.layout.height} {...this.props} />
                     </Suspense>
                 }
             </>

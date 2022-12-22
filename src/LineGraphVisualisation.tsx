@@ -6,6 +6,7 @@ import { TIME } from "./FieldTypes";
 import { ReactComponent as TooltipImage } from "./resources/line.svg";
 import ExpandingCard from "./ExpandingCard";
 import PlotWrapper from "./PlotWrapper";
+import CardStack from "./CardStack";
 
 const MAX_GRAPHS = 5; // performance! todo: make the user aware if unable to visualise all the data?
 
@@ -38,41 +39,42 @@ function LineGraph({ log }: VisualisationProps) {
 
     const layout = { ...layoutConfig, height: 500, xaxis: { title: { text: log.headers[timestampFieldIndex], standoff: 15 }, automargin: true }, yaxis: { automargin: true } };
 
-    return (<div className="line-graph-vis-container">
-        {splitLogs.length > 1 &&
+    return (
+        <CardStack>
+            {splitLogs.length > 1 &&
 
-            <Warning title="Split graphs">
-                <div>Your data has been split into {splitLogs.length} graphs as multiple time ranges have been found in the logged data. This may happen if you unplug or reset your micro:bit in between logging data.</div>
-            </Warning>
+                <Warning title="Split graphs">
+                    <div>Your data has been split into {splitLogs.length} graphs as multiple time ranges have been found in the logged data. This may happen if you unplug or reset your micro:bit in between logging data.</div>
+                </Warning>
 
-        }
-        {splitLogs.map(log => { // map each time range to a plotly graph
-            const graphX = log.dataForHeader(timestampFieldIndex, true);
-
-            const data: Data[] = log.headers.filter((_, ix) => ix !== timestampFieldIndex).map((header, index): Data => {
-                return {
-                    name: header,
-                    type: "scatter",
-                    mode: "lines+markers",
-                    x: graphX,
-                    y: log.dataForHeader(header, true),
-                    line: {
-                        color: colors[(index - 1) % colors.length],
-                    },
-                    marker: {
-                        // There are more than this but they look increasingly odd.
-                        symbol: 0// (index - 1) % 24,
-                    },
-                };
             }
-            );
+            {splitLogs.map(log => { // map each time range to a plotly graph
+                const graphX = log.dataForHeader(timestampFieldIndex, true);
 
-            let rowFrom = currentRow + 1;
-            let rowTo = (currentRow += log.data.length);
+                const data: Data[] = log.headers.filter((_, ix) => ix !== timestampFieldIndex).map((header, index): Data => {
+                    return {
+                        name: header,
+                        type: "scatter",
+                        mode: "lines+markers",
+                        x: graphX,
+                        y: log.dataForHeader(header, true),
+                        line: {
+                            color: colors[(index - 1) % colors.length],
+                        },
+                        marker: {
+                            // There are more than this but they look increasingly odd.
+                            symbol: 0// (index - 1) % 24,
+                        },
+                    };
+                }
+                );
 
-            return <LineGraphElement key={rowFrom} rowFrom={rowFrom} rowTo={rowTo} data={data} layout={layout} config={visualisationConfig} />
-        })}
-    </div>);
+                let rowFrom = currentRow + 1;
+                let rowTo = (currentRow += log.data.length);
+
+                return <LineGraphElement key={rowFrom} rowFrom={rowFrom} rowTo={rowTo} data={data} layout={layout} config={visualisationConfig} />
+            })}
+        </CardStack>);
 };
 
 interface LineGraphElementProps {

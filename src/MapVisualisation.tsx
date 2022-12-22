@@ -22,15 +22,23 @@ const MapConsentFooter = styled.div`
     margin-top: 0.8em;
 `;
 
-const MapWrapper = styled(PlotWrapper)`
+const MapCard = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0.5em;
+    margin-top: 0.5em;
+`;
+
+const MapPlotWrapper = styled(PlotWrapper)`
     border-radius: 8px;
     overflow: hidden;
-    margin: 0.4em 0;
+    flex: 1;
 `;
 
 const MapConfigWrapper = styled.div`
     display: flex;
-    gap: 0.7em;
+    gap: 0.5em;
 
     div {
         display: flex;
@@ -38,7 +46,7 @@ const MapConfigWrapper = styled.div`
         background: #f4f4f4;
         padding: 0.4em;
         border-radius: 8px;
-        gap: 1em;
+        gap: 0.5em;
         align-items: center;
 
         label {
@@ -173,26 +181,28 @@ function Map({ log }: VisualisationProps) {
             }
 
             <ExpandingCard title={<><RiMap2Line />Map</>} displayFullscreenButton={true}>
-                <MapWrapper data={[data]} layout={layout} config={visualisationConfig} />
+                <MapCard>
+                    <MapPlotWrapper data={[data]} layout={layout} config={visualisationConfig} />
 
-                <MapConfigWrapper>
-                    <div>
-                        <label htmlFor="map-column-selector">Colour by column</label>
-                        <select id="map-column-selector" placeholder="Set column to visualise" onChange={e => setVisualiseColumn(e.target.value)} disabled={markerType === "lines"} defaultValue={visualiseColumn || undefined}>
-                            {log.headers.map(h =>
-                                <option key={h} value={h}>{h}</option>
-                            )}
-                        </select>
-                    </div>
-                    <div>
-                        <label htmlFor="map-marker-selector">Marker type</label>
-                        <select id="map-marker-selector" placeholder="Set column to visualise" onChange={e => setMarkerType(e.target.value as MarkerType)} defaultValue={markerType}>
-                            <option value={"markers"}>Markers</option>
-                            <option value={"lines"}>Lines</option>
-                            <option value={"lines+markers"}>Markers and Lines</option>
-                        </select>
-                    </div>
-                </MapConfigWrapper>
+                    <MapConfigWrapper>
+                        <div>
+                            <label htmlFor="map-column-selector">Colour by column</label>
+                            <select id="map-column-selector" placeholder="Set column to visualise" onChange={e => setVisualiseColumn(e.target.value)} disabled={markerType === "lines"} defaultValue={visualiseColumn || undefined}>
+                                {log.headers.map(h =>
+                                    <option key={h} value={h}>{h}</option>
+                                )}
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="map-marker-selector">Marker type</label>
+                            <select id="map-marker-selector" placeholder="Set column to visualise" onChange={e => setMarkerType(e.target.value as MarkerType)} defaultValue={markerType}>
+                                <option value={"markers"}>Markers</option>
+                                <option value={"lines"}>Lines</option>
+                                <option value={"lines+markers"}>Markers and Lines</option>
+                            </select>
+                        </div>
+                    </MapConfigWrapper>
+                </MapCard>
             </ExpandingCard>
         </>
     );

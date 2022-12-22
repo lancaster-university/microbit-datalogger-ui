@@ -8,13 +8,12 @@ export interface WarningProps {
 }
 
 const WarningCard = styled(Card)`
-    background: #494d53;
-    color: white;
-    padding: 0.6em;
+    background: #f7f7f7;
+    color: #444444;
+    padding: 0.85em;
     display: flex;
     align-items: center;
     line-height: 1.3;
-    margin-bottom: 0.8em;
 
     .icon {
         font-size: 1.8em;
@@ -23,10 +22,6 @@ const WarningCard = styled(Card)`
 
     h3 {
         margin: 0 0 0.1em 0;
-    }
-
-    a {
-        color: #eee;
     }
 `;
 
