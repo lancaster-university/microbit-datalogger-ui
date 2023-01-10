@@ -150,7 +150,7 @@ export default function StandaloneHomePage({ logLoaded }: StandaloneHomePageProp
             <FilePickerWrapper>
                 <IconButton icon={<RiFolderOpenLine />} caption="Choose file" onClick={() => filePicker.current?.click()} />
                 <IconButton icon={<RiClipboardLine />} caption="Load from clipboard" onClick={loadFromClipboard} />
-                <input type="file" ref={filePicker} onChange={loadFile} accept=".csv" />
+                <input type="file" ref={filePicker} onChange={loadFile} accept=".csv,.htm,.html" />
             </FilePickerWrapper>
             {
                 loadErrorVisible &&

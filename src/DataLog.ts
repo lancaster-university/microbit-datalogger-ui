@@ -69,7 +69,7 @@ export default class DataLog {
 
             const full = raw.substring(logEnd + 1, logEnd + 4) === "FUL";
 
-            return { log: this.fromCSV(raw.substring(dataStart, dataStart + dataSize), full), bytesRemaining, daplinkVersion, dataSize, hash, standalone: false };
+            return { log: this.fromCSV(raw.substring(dataStart, dataStart + dataSize), full), bytesRemaining, daplinkVersion, dataSize, hash, type: "html_file" };
         }
 
         return this.fromCSV(data).asStandaloneLog();
@@ -224,7 +224,7 @@ export default class DataLog {
             daplinkVersion: 0,
             dataSize: 0,
             hash: 0,
-            standalone: true
+            type: "csv_file"
         });
     }
 }

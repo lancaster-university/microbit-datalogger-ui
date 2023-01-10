@@ -9,6 +9,7 @@ import ExpandingCard from "./ExpandingCard";
 import styled from "@emotion/styled";
 import Card from "./Card";
 import PlotWrapper from "./PlotWrapper";
+import CardStack from "./CardStack";
 
 type MarkerType = "markers" | "lines+markers" | "lines";
 
@@ -173,7 +174,7 @@ function Map({ log }: VisualisationProps) {
     };
 
     return (
-        <>
+        <CardStack>
             {invalidCoords &&
                 <Warning title="Invalid co-ordinate data">
                     <div>Some of the fields within the graph have been rounded as they contained invalid latitude or longitude values</div>
@@ -204,7 +205,7 @@ function Map({ log }: VisualisationProps) {
                     </MapConfigWrapper>
                 </MapCard>
             </ExpandingCard>
-        </>
+        </CardStack>
     );
 }
 

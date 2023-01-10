@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 export interface ModalProps extends ModalContents {
     onClose?: () => any;
+    buttons?: React.ReactNode;
 }
 
 export interface ModalContents {
@@ -59,6 +60,7 @@ const ModalTitle = styled.div`
 const ModalFooter = styled.div`
     display: flex;
     justify-content: flex-end;
+    gap: 0.5em;
 `;
 
 export default function Modal(props: ModalProps) {
@@ -98,7 +100,7 @@ export default function Modal(props: ModalProps) {
                 {props.children}
             </div>
             <ModalFooter>
-                {!props.hideCloseButton && <button ref={closeButtonRef} onClick={close}>Close</button>}
+                {props.buttons}{!props.hideCloseButton && <button ref={closeButtonRef} onClick={close}>Close</button>}
             </ModalFooter>
         </ModalRoot>
     )

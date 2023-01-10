@@ -27,7 +27,13 @@ export const TIME: FieldType = {
     name: "Timestamp"
 };
 
-const FIELDS = [LATITUDE, LONGITUDE, TIME];
+export const RTC_TIME: FieldType = {
+    icon: <RiTimeLine/>,
+    validator: /date/i,
+    name: "Date and Time"
+};
+
+const FIELDS = [LATITUDE, LONGITUDE, TIME, RTC_TIME];
 
 export function detect(header: string): FieldType | null {
     return FIELDS.find(field => field.validator.test(header)) || null;

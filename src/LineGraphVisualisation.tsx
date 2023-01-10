@@ -59,11 +59,10 @@ function LineGraph({ log }: VisualisationProps) {
                         x: graphX,
                         y: log.dataForHeader(header, true),
                         line: {
-                            color: colors[(index - 1) % colors.length],
+                            color: colors[(index) % colors.length],
                         },
                         marker: {
-                            // There are more than this but they look increasingly odd.
-                            symbol: 0// (index - 1) % 24,
+                            symbol: (index) % 24,
                         },
                     };
                 }

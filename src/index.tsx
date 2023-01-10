@@ -24,7 +24,21 @@ export interface LogData {
   dataSize: number;
   bytesRemaining: number;
   daplinkVersion: number;
-  standalone: boolean;
+  /**
+   * csv_file  - the data is loaded from a .csv file. 'hash', 'dataSize', 'bytesRemaining'
+   *             and 'daplinkVersion' don't exist in this context as the data isn't from
+   *             a micro:bit so are set to 0
+   * 
+   * html_file - the data is a MY_FILES.HTM document which is uploaded through the
+   *             standalone data prompt. This DOES contain all fields since it is from a
+   *             micro:bit, but doesn't support live-updating as we don't have direct
+   *             access to the HTML file on disk
+   * 
+   * embedded  - the interface is embedded inside a MY_FILES.HTM document. We have access
+   *             to all properties and can do live updating by mounting the file within an
+   *             iframe and checking for changes to the hash
+   */
+  type: "csv_file" | "html_file" | "embedded";
 }
 
 /**

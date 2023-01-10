@@ -329,8 +329,8 @@ export default function App(props: LogData) {
   const help = () => {
     window.open("https://microbit.org/get-started/user-guide/data-logging/", "_blank");
   };
-  
-  const logFullness = props.standalone || props.log.isFull ? "100.0" : (props.dataSize / (props.dataSize + props.bytesRemaining)).toFixed(1);
+
+  const logFullness = (props.type !== "embedded" && props.type !== "html_file") || props.log.isFull ? "100.0" : (props.dataSize / (props.dataSize + props.bytesRemaining)).toFixed(1);
 
   return (
     <AppWrapper>
@@ -346,7 +346,7 @@ export default function App(props: LogData) {
 
         <h1>micro:bit data log
           {
-            !props.standalone &&
+            (props.type === "embedded" || props.type === "html_file") &&
             <Tooltip direction="right" content={`Data log storage is ${logFullness}% full. Using ${props.dataSize} bytes out of ${(props.dataSize + props.bytesRemaining)}`}>
               <LogSpaceIndicator>{logFullness}% full</LogSpaceIndicator>
             </Tooltip>
@@ -368,16 +368,15 @@ export default function App(props: LogData) {
             <IconButton onClick={copy} icon={<RiClipboardLine />} caption="Copy" />
           </Tooltip>
 
-          {!props.standalone &&
-            <Tooltip content="Updates the page with new data from disk">
-              <IconButton onClick={updateData} icon={<RiRefreshLine />} caption="Update data" />
-            </Tooltip>
-          }
-
-          {!props.standalone &&
-            <Tooltip content="Displays information about how to clear all the data from the log">
-              <IconButton onClick={clearLog} icon={<RiDeleteBin2Line />} caption="Clear log" />
-            </Tooltip>
+          {props.type === "embedded" &&
+            <>
+              <Tooltip content="Updates the page with new data from disk">
+                <IconButton onClick={updateData} icon={<RiRefreshLine />} caption="Update data" />
+              </Tooltip>
+              <Tooltip content="Displays information about how to clear all the data from the log">
+                <IconButton onClick={clearLog} icon={<RiDeleteBin2Line />} caption="Clear log" />
+              </Tooltip>
+            </>
           }
 
           {window.localStorage.getItem("debug") &&
