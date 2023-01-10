@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "https://lancaster-university.github.io/microbit-datalogger-ui/dl.css",
+    "main.js": "https://lancaster-university.github.io/microbit-datalogger-ui/dl.js",
+    "js/772.chunk.e939f434.js": "https://lancaster-university.github.io/microbit-datalogger-ui/js/772.chunk.e939f434.js",
+    "js/286.chunk.e939f434.js": "https://lancaster-university.github.io/microbit-datalogger-ui/js/286.chunk.e939f434.js",
+    "static/media/map.svg": "https://lancaster-university.github.io/microbit-datalogger-ui/static/media/map.b1137221033d035c828f07c84663d24f.svg",
+    "static/media/microbit-logo.svg": "https://lancaster-university.github.io/microbit-datalogger-ui/static/media/microbit-logo.2486b5bceda3f76b82044a420f41afee.svg",
+    "static/media/line.svg": "https://lancaster-university.github.io/microbit-datalogger-ui/static/media/line.02de96e53714e3c89f25f6fd4eb06f7a.svg",
+    "static/media/tally.svg": "https://lancaster-university.github.io/microbit-datalogger-ui/static/media/tally.dd341c3ef002f08153cda69265cfaeda.svg",
+    "index.html": "https://lancaster-university.github.io/microbit-datalogger-ui/index.html",
+    "dl.css.map": "https://lancaster-university.github.io/microbit-datalogger-ui/dl.css.map",
+    "dl.js.map": "https://lancaster-university.github.io/microbit-datalogger-ui/dl.js.map",
+    "772.chunk.e939f434.js.map": "https://lancaster-university.github.io/microbit-datalogger-ui/js/772.chunk.e939f434.js.map",
+    "286.chunk.e939f434.js.map": "https://lancaster-university.github.io/microbit-datalogger-ui/js/286.chunk.e939f434.js.map"
+  },
+  "entrypoints": [
+    "dl.css",
+    "dl.js"
+  ]
+}
