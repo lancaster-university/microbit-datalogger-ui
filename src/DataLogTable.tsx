@@ -1,7 +1,8 @@
 import styled from "@emotion/styled";
-import React from "react";
+import React, { useState } from "react";
 import DataLog from "./DataLog";
 import { detect, FieldType, TIME } from "./FieldTypes";
+import Modal from "./Modal";
 import Tooltip from "./Tooltip";
 
 export interface DataLogProps {
@@ -67,7 +68,7 @@ const Table = styled.table`
     }
 `;
 
-const TableRow = styled.tr<{discontinuous: boolean, header: boolean}>`
+const TableRow = styled.tr<{ discontinuous: boolean, header: boolean }>`
     border-top: ${props => props.discontinuous && "4px dashed #777"};
 
     font-weight: ${props => props.header && "bold"};
@@ -91,7 +92,39 @@ const highlightRow = (e: React.MouseEvent<HTMLTableCellElement>) => {
     selection?.addRange(range);
 };
 
+const TimePicker = styled.div`
+    display: flex;
+    gap: 0.5em;
+    margin-top: 0.8em;
+
+    border-top: thin solid rgba(0, 0, 0, 0.3);
+    padding-top: 0.8em;
+`;
+
+const TimestampModal = ({ onClose }: { onClose?: (date?: Date) => any }) => {
+
+    const [dateTime, setDateTime] = useState<Date | null>();
+
+    return (
+        <Modal title="Add realtime column" onClose={() => onClose && onClose(dateTime || undefined)} buttons={<button className="primary">Save</button>}>
+            <>
+                The micro:bit does not have a built-in real-time clock. This means that it does not have the ability to track and
+                store the exact time at which data is logged. However, by providing a time input, the timestamps can be approximated
+                and displayed in a new data column.
+
+                <TimePicker>
+                    <label htmlFor={"realtimeTimePicker"}>Timestamp</label>
+                    <input type="datetime-local" id={"realtimeTimePicker"} onChange={e => setDateTime(e.target.valueAsDate)} />
+                </TimePicker>
+            </>
+        </Modal>
+    );
+}
+
 function DataLogTable(props: DataLogProps) {
+
+    const [timestampModalVisible, setTimestampModalVisible] = useState(false);
+
     const logLength = props.log.data.length;
 
     const rows = [];
@@ -124,7 +157,7 @@ function DataLogTable(props: DataLogProps) {
             const icon = formattedType && formattedType.icon;
 
             return row.push(
-                <td key={index}>
+                <td key={index} onClick={formattedType === TIME ? () => setTimestampModalVisible(true) : undefined}>
                     {!!icon ? <Tooltip content={`Column detected as ${formattedType.name}`} direction="bottom">{icon}</Tooltip> : ""}{!data ? <EmptyData>-</EmptyData> : data}
                 </td>
             );
@@ -138,11 +171,16 @@ function DataLogTable(props: DataLogProps) {
     }
 
     return (
-        <Table>
-            <tbody>
-                {rows}
-            </tbody>
-        </Table>
+        <>
+            {timestampModalVisible &&
+                <TimestampModal />
+            }
+            <Table>
+                <tbody>
+                    {rows}
+                </tbody>
+            </Table>
+        </>
     );
 }
 
